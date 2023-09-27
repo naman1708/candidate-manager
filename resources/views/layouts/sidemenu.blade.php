@@ -18,7 +18,7 @@
             <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
                 {{-- details --}}
-                <li class="menu-title">Details</li>
+                {{-- <li class="menu-title">Details</li> --}}
                 <li>
                     <a href="{{route('dashboard')}}" class="waves-effect">
                         {{-- <i class="ri-dashboard-line"></i> --}}
@@ -29,7 +29,7 @@
                 </li>
 
                 {{-- users --}}
-                <li class="menu-title">Information</li>
+                <li class="menu-title">Candidates</li>
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="ri-account-circle-line"></i>

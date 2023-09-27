@@ -12,7 +12,7 @@ class Card extends Component
      * Create a new component instance.
      */
     public $heading, $value, $icon, $color,$desc;
-    public function __construct( $heading="Heading", $value="0", $icon="mdi-currency-inr" , $color="success", $desc="")  
+    public function __construct( $heading="Heading", $value="0", $icon="mdi mdi-account" , $color="success", $desc="")  
     {
         $this->heading = $heading;
         $this->value = $value;

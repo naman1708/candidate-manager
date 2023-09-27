@@ -52,7 +52,7 @@ class InformationController extends Controller
             'status' => ['required'],
             'salary' => ['required'],
             'expectation' => ['required'],
-            'upload_resume' => ['required', 'file', 'mimes:pdf,doc,docx'],
+            'upload_resume' => ['required'],
         ]);
 
         DB::beginTransaction();
@@ -117,7 +117,7 @@ class InformationController extends Controller
             'status' => ['required'],
             'salary' => ['required'],
             'expectation' => ['required'],
-            'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
+            // 'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
         ]);
 
         DB::beginTransaction();
