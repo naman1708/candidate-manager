@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Information;
+use App\Models\Candidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
-class InformationController extends Controller
+class CandidateController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Information::query();
+        $query = Candidate::query();
 
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where('candidate_name', 'LIKE', "%$search%")
                 ->orWhere('email', 'LIKE', "%$search%")
+                ->orWhere('contact', 'LIKE', "%$search%")
                 ->orWhere('categories', 'LIKE', "%$search%")
                 ->orWhere('experience', 'LIKE', "%$search%");
         }
-        $informations = $query->paginate(10);
-        return view('information.all', compact('informations'));
+        $candidates = $query->paginate(10);
+        return view('candidates.all', compact('candidates'));
     }
 
     /**
@@ -32,7 +34,7 @@ class InformationController extends Controller
      */
     public function create()
     {
-        return view('information.add');
+        return view('candidates.add');
     }
 
     /**
@@ -43,16 +45,17 @@ class InformationController extends Controller
     {
         $request->validate([
             'candidate_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:information,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:candidates,email'],
             'categories' => ['required'],
             'date' => ['required'],
-            'source' => ['required'],
             'experience' => ['required'],
-            'contact' => ['required'],
+            'contact' => ['required', 'unique:candidates,contact'],
             'status' => ['required'],
-            'salary' => ['required'],
-            'expectation' => ['required'],
-            'upload_resume' => ['required'],
+            // 'contact_by' => ['required'],
+            // 'salary' => ['required'],
+            // 'expectation' => ['required'],
+            // 'source' => ['required'],
+            // 'upload_resume' => ['required'],
         ]);
 
         DB::beginTransaction();
@@ -62,7 +65,6 @@ class InformationController extends Controller
             //     $resumePath = $request->file('upload_resume')->store('resumes', 'local');
             //     $data['upload_resume'] = $resumePath;
             // }
-
             if ($request->hasFile('upload_resume')) {
                 $uploadedFile = $request->file('upload_resume');
                 $originalFileName = $uploadedFile->getClientOriginalName();
@@ -70,7 +72,7 @@ class InformationController extends Controller
                 $data['upload_resume'] = $resumePath;
             }
 
-            Information::create($data);
+            Candidate::create($data);
         } catch (\Exception $e) {
             DB::rollback();
             dd("rollback", $e->getMessage());
@@ -84,20 +86,20 @@ class InformationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($information)
+    public function show($candidates)
     {
-        $information = Information::find($information);
-        return view('information.view')->with(compact('information'));
+        $candidates = Candidate::find($candidates);
+        return view('candidates.view')->with(compact('candidates'));
     }
 
 
     /**
      * Edit the specified resource.
      */
-    public function edit($information)
+    public function edit($candidates)
     {
-        $information = Information::find($information);
-        return view('information.edit')->with(compact('information'));
+        $candidates = Candidate::find($candidates);
+        return view('candidates.edit')->with(compact('candidates'));
     }
 
 
@@ -106,25 +108,28 @@ class InformationController extends Controller
      */
     public function update(Request $request)
     {
-        $request->validate([
-            'candidate_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            'categories' => ['required'],
-            'date' => ['required'],
-            'source' => ['required'],
-            'experience' => ['required'],
-            'contact' => ['required'],
-            'status' => ['required'],
-            'salary' => ['required'],
-            'expectation' => ['required'],
-            // 'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
-        ]);
+        
+            $request->validate([
+                'candidate_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255'],
+                'categories' => ['required'],
+                'date' => ['required'],
+                'source' => ['required'],
+                'experience' => ['required'],
+                'contact' => [  'required',Rule::unique('candidates', 'contact')->ignore($request->id),
+                ],
+                'contact_by' => ['required'],
+                'status' => ['required'],
+                'salary' => ['required'],
+                'expectation' => ['required'],
+                // 'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
+            ]);
 
         DB::beginTransaction();
 
         try {
             $data = $request->all();
-            $information = Information::find($request->id);
+            $candidates = Candidate::find($request->id);
 
             if ($request->hasFile('upload_resume')) {
                 $uploadedFile = $request->file('upload_resume');
@@ -135,14 +140,14 @@ class InformationController extends Controller
                     return redirect()->back()->with('status', 'There was an error uploading the resume file.');
                 }
                 // Delete the old resume file if it exists
-                if (!empty($information->upload_resume)) {
-                    Storage::disk('local')->delete($information->upload_resume);
+                if (!empty($candidates->upload_resume)) {
+                    Storage::disk('local')->delete($candidates->upload_resume);
                 }
                 $data['upload_resume'] = $resumePath;
             } elseif (empty($data['upload_resume'])) {
-                $data['upload_resume'] = $information->upload_resume;
+                $data['upload_resume'] = $candidates->upload_resume;
             }
-            $information->update($data);
+            $candidates->update($data);
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('status', 'Something went wrong!');
@@ -155,18 +160,19 @@ class InformationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($information)
+    public function destroy(Candidate $candidate)
     {
         DB::beginTransaction();
         try {
-            Information::find($information)->delete();
+            $candidate->delete();
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('status', 'Information cannot be deleted!');
+            return redirect()->back()->with('status', 'Candidate cannot be deleted!');
         }
         DB::commit();
-        return redirect()->back()->with('status', 'Information deleted successfully!');
+        return redirect()->back()->with('status', 'Candidate deleted successfully!');
     }
+    
 
 
     /**
@@ -176,8 +182,8 @@ class InformationController extends Controller
     {
         DB::beginTransaction();
         try {
-            $information = Information::find($resume);
-            $resumePath = $information->upload_resume;
+            $candidates = Candidate::find($resume);
+            $resumePath = $candidates->upload_resume;
             if (Storage::disk('local')->exists($resumePath)) {
                 return Storage::download($resumePath);
             } else {

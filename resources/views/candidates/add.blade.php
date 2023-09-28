@@ -1,11 +1,11 @@
 @extends('layouts.main')
 
 @push('page-title')
-<title>{{ __('Edit Informations')}}</title>
+<title>{{ __('Add New Candidates')}}</title>
 @endpush
 
 @push('heading')
-{{ 'Edit Informations' }} : {{$information->candidate_name}}
+{{ __('Add New Candidates') }}
 @endpush
 
 @section('content')
@@ -16,80 +16,86 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-body">
-
-                <form method="post" action="{{ route('informations.update') }}" enctype="multipart/form-data">
-                    <input type="hidden" name="id" id="" value="{{$information->id}}">
+                
+                <form method="post" action="{{route('candidate.save')}}" enctype="multipart/form-data">
                     @csrf
                     <h4 class="card-title mb-3">{{__('Personal Details')}}</h4>      
                     
                     <div class="row">
                         <div class="col-lg-6">
-                           <x-form.input name="candidate_name" label="Candidate Name" :value="$information->candidate_name"/>
+                           <x-form.input name="candidate_name" label="Candidate Name"/>
                         </div>
                         <div class="col-lg-6">
-                            <x-form.input name="email" label="Email Address" :value="$information->email"/>
+                            <x-form.input name="contact" label="Contact Number"/>
                         </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <x-form.input name="email" label="Email Address"/>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                           <x-form.input name="contact_by" label="Contact By"/>
+                        </div>
+                      
                     </div>
 
                     <div class="row">
                         <div class="col-lg-6">
-                            <x-form.select name="categories" label="Categories" :options="[
+                            <x-form.select name="categories" label="Role" :options="[
                                 'PHP' => 'PHP',
                                 'Front end' => 'Front end',
                                 'Freshers' => 'Freshers',
                                 'HR' => 'HR',
                                 'BDE' => 'BDE',
-                            ]" :selected="$information->categories" />
+                            ]"/>
                         </div>
 
                         <div class="col-lg-6">
-                            <x-form.input name="date" label="Date" type="date" :value="$information->date"/>
+                            <x-form.input name="date" label="Date" type="date" value="<?php echo date('Y-m-d'); ?>" />
                         </div>
                     </div>
 
 
                     <div class="row">
                         <div class="col-lg-6">
-                            <x-form.input name="source" label="Source" :value="$information->source" />
+                            <x-form.input name="source" label="Source" />
                         </div>
 
                         <div class="col-lg-6">
-                            <x-form.input name="experience" label="Experience" :value="$information->experience"/>
+                            <x-form.input name="experience" label="Experience"/>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-lg-6">
-                            <x-form.input name="salary" label="Salary" :value="$information->salary"/>
+                            <x-form.input name="salary" label="Salary"/>
                         </div>
 
                         <div class="col-lg-6">
-                            <x-form.input name="expectation" label="Expectation" :value="$information->expectation"/>
+                            <x-form.input name="expectation" label="Expectation"/>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-6">
-                            <x-form.input name="contact" label="Contact" :value="$information->contact"/>
-                        </div>
                         <div class="col-lg-6">
                             {{-- <x-form.input name="status" label="Status" type="text"/> --}}
                             <label for="">Status</label>
-                            <input type="text" name="status" value="{{$information->status}}" class="form-control">
+                            <input type="text" name="status" value="{{old('status')}}" class="form-control">
                             @error('status')
                                 <span class="text-danger">{{$message}}</span>
                             @enderror
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <x-form.input name="upload_resume" label="Upload Resume" type="file"/>
                         </div>
                     </div>
 
                     <div>
-                        <button class="btn btn-primary" type="submit">{{__('update Information')}}</button>
+                        <button class="btn btn-primary" type="submit">{{__('Add Candidate')}}</button>
                     </div>
                 </form>
            </div>

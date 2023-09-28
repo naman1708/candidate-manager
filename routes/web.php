@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\InvestorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InformationController;
@@ -52,19 +53,19 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/profile/update-password', [ProfileController::class, 'update_password'])->name('profile.update_password');
 
 
-    // Informations routes
-    Route::get('/informations', [InformationController::class, 'index'])->name('informations');
-    Route::get('/view-informations/{informations?}', [InformationController::class, 'show'])->name('informations.view');
+    // candidate routes
+    Route::get('/candidates/{search?}/{category?}', [CandidateController::class, 'index'])->name('candidates');
+    Route::get('/view-candidate/{candidate?}', [CandidateController::class, 'show'])->name('candidate.view');
 
-    Route::get('/add-informations', [InformationController::class, 'create'])->name('informations.add');
-    Route::post('/add-informations', [InformationController::class, 'store'])->name('informations.save');
+    Route::get('/add-candidate', [CandidateController::class, 'create'])->name('candidate.add');
+    Route::post('/add-candidate', [CandidateController::class, 'store'])->name('candidate.save');
 
-    Route::get('/edit-informations/{informations?}', [InformationController::class, 'edit'])->name('informations.edit');
-    Route::post('/edit-informations', [InformationController::class, 'update'])->name('informations.update');
+    Route::get('/edit-candidate/{candidate?}', [CandidateController::class, 'edit'])->name('candidate.edit');
+    Route::post('/edit-candidate', [CandidateController::class, 'update'])->name('candidate.update');
 
-    Route::get('/delete-informations/{informations?}',[InformationController::class , 'destroy'])->name('informations.delete');
+    Route::get('/delete-candidate/{candidate?}',[CandidateController::class , 'destroy'])->name('candidate.delete');
 
-    Route::get('/download-resume/{resume}', [InformationController::class, 'downloadResume'])->name('download.resume');
+    Route::get('/download-resume/{resume?}', [CandidateController::class, 'downloadResume'])->name('download.resume');
 
 });
 

@@ -36,8 +36,8 @@
                         <span>Details</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
-                        <li><a href="{{route('informations')}}">View All</a></li>
-                        <li><a href="{{route('informations.add')}}">Add New</a></li>
+                        <li><a href="{{route('candidates')}}">View All</a></li>
+                        <li><a href="{{route('candidate.add')}}">Add New</a></li>
                     </ul>
                 </li>
 
