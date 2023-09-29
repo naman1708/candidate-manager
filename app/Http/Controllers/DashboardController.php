@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Information;
-use App\Models\Investment;
-use App\Models\Transaction;
+use App\Models\Candidate;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -14,7 +12,7 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $informations = Information::all();
+        $informations = Candidate::all();
         $total['count'] = $informations->count();
         return view('dashboard')->with(compact('total'));
     }

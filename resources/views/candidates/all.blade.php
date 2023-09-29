@@ -17,17 +17,21 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="w-25" style="padding-left: 30px;">
-                    <x-form.select name="categories" label="Select Role" :options="[
-                        '' => 'All',
-                        'PHP' => 'PHP',
-                        'Front end' => 'Front end',
-                        'Freshers' => 'Freshers',
-                        'HR' => 'HR',
-                        'BDE' => 'BDE',
-                    ]"
-                    :selected="request('category')"/>
-                </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mt-4 justify-content" style="padding-left: 30px; width:300px; ">
+                                <x-form.select name="categories" label="Select Role Filter" :options="[
+                                    '' => 'All',
+                                    'PHP' => 'PHP',
+                                    'Front end' => 'Front end',
+                                    'Freshers' => 'Freshers',
+                                    'HR' => 'HR',
+                                    'BDE' => 'BDE',
+                                ]"
+                                :selected="request('category')"/>
+                            </div>
+                        </div>
+                    </div>
 
                 <div class="float-right">
                     <x-search.table-search action="{{ route('candidates') }}" method="get" name="search"
@@ -75,7 +79,7 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{{ route('download.resume', ['resume' => $info->id]) }}" target="_blank"
+                                        <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
                                             class="btn btn-primary btn-sm">Download</a>
 
                                     </td>

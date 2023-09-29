@@ -16,9 +16,19 @@ class CandidateController extends Controller
     public function index(Request $request)
     {
         $query = Candidate::query();
-
-        if ($request->has('search')) {
-            $search = $request->input('search');
+        $category = $request->input('category');
+        $search = $request->input('search');
+        if (!empty($search) && !empty($category)) {
+            $query->where('categories', 'LIKE', "%$category%")
+                ->where(function ($query) use ($search) {
+                    $query->where('candidate_name', 'LIKE', "%$search%")
+                        ->orWhere('email', 'LIKE', "%$search%")
+                        ->orWhere('contact', 'LIKE', "%$search%")
+                        ->orWhere('experience', 'LIKE', "%$search%");
+                });
+        } elseif (empty($search) && !empty($category)) {
+            $query->where('categories', $category);
+        } elseif (!empty($search) && empty($category)) {
             $query->where('candidate_name', 'LIKE', "%$search%")
                 ->orWhere('email', 'LIKE', "%$search%")
                 ->orWhere('contact', 'LIKE', "%$search%")
@@ -182,19 +192,23 @@ class CandidateController extends Controller
     {
         DB::beginTransaction();
         try {
-            $candidates = Candidate::find($resume);
-            $resumePath = $candidates->upload_resume;
-            if (Storage::disk('local')->exists($resumePath)) {
-                return Storage::download($resumePath);
-            } else {
+            $candidate = Candidate::find($resume);
+    
+            if (!$candidate) {
+                return redirect()->back()->with('status', 'Candidate not found.');
+            }
+    
+            $resumePath = $candidate->upload_resume;
+    
+            if (!$resumePath || !Storage::disk('local')->exists($resumePath)) {
                 return redirect()->back()->with('status', 'Resume not found.');
             }
+    
+            return Storage::download($resumePath);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('status', 'Resume cannot be Download.');
+            return redirect()->back()->with('status', $e->getMessage());
         }
-
-        DB::commit();
-        return redirect()->back()->with('status', 'Download Resume deleted successfully!');
     }
+    
 }

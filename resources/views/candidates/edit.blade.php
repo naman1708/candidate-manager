@@ -95,11 +95,14 @@
                             <x-form.input name="upload_resume" label="Upload Resume" type="file"/>
                         </div>
                         <div class="col-lg-2 mt-lg-4">
-                            <a href="{{ asset('storage')}}/{{$candidates->upload_resume}}" target="_blank">View Resume</a>
-
+                            {{-- <a href="{{ asset('resumes/Comfort.png') }}" target="_blank">View Resume</a> --}}
+                            @if (! @empty($candidates->upload_resume))
+                            <strong class="text-primary">{{ basename($candidates->upload_resume) }}</strong>
+                            @else
+                            <strong class="text-primary">No File</strong>
+                            @endif
                         </div>
                     </div>
-
 
                     <div>
                         <button class="btn btn-primary" type="submit">{{__('update Candidate')}}</button>
