@@ -5,7 +5,7 @@
     function optionsHelper( $data, $id='id', $valueKey='name' ) {
         $items = [];
         $valueKeys = explode('.',$valueKey);
-        
+
         foreach ( $data as $item ) {
             $val ="";
             foreach($valueKeys as $vkey) {
@@ -17,11 +17,13 @@
         return $items;
     }
 
-    // User role checker 
+
+
+    // User role checker
     function role( $role ) {
         if(auth()->user()->role == $role) {
             return true;
-        } 
+        }
         return false;
     }
 
@@ -29,7 +31,7 @@
     function admin() {
         if(auth()->user()->role == 'admin') {
             return true;
-        } 
+        }
         return false;
     }
 

@@ -3,6 +3,7 @@ $(document).ready(function() {
         searching: false,
         "paging":   false,
         "bInfo" : false,
+        fixedColumns: true,
         // "ordering": false,
         // "info":     false,
         language: {
@@ -34,8 +35,8 @@ $(document).ready(function() {
 
 
 
-    a.buttons().container().appendTo("#datatable-buttons_wrapper .col-md-6:eq(0)"), 
-    	$(".dataTables_length select").addClass("form-select form-select-sm"), 
+    a.buttons().container().appendTo("#datatable-buttons_wrapper .col-md-6:eq(0)"),
+    	$(".dataTables_length select").addClass("form-select form-select-sm"),
     	$("#selection-datatable").DataTable({
         select: {
             style: "multi"

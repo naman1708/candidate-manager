@@ -9,10 +9,10 @@
                 </div>
                 <div class="avatar-sm">
                     <span class="avatar-title bg-light text-{{$color}} rounded-3">
-                        <i class="mdi {{$icon}} font-size-24"></i>  
+                        <i class="mdi {{$icon}} font-size-20"></i>
                     </span>
                 </div>
-            </div>                                            
+            </div>
         </div><!-- end cardbody -->
     </div><!-- end card -->
 </div>

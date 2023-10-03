@@ -18,24 +18,27 @@
         <div class="col-12">
             <div class="card">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-lg-6">
                             <div class="mt-4 justify-content" style="padding-left: 30px; width:300px; ">
-                                <x-form.select name="categories" label="Select Role Filter" :options="[
-                                    '' => 'All',
-                                    'PHP' => 'PHP',
-                                    'Front end' => 'Front end',
-                                    'Freshers' => 'Freshers',
-                                    'HR' => 'HR',
-                                    'BDE' => 'BDE',
-                                ]"
-                                :selected="request('category')"/>
+                            <div class="mb-3">
+                                <label for="">Role</label>
+                                <select name="candidate_role_id" id="candidate_role_id" class="form-control">
+                                    <option value="">All</option>
+                                    @foreach ($candidateRole as $role)
+                                        <option value="{{ $role->candidate_role }}" {{request('candidate_role')==$role->candidate_role?'selected':''}}>{{ $role->candidate_role }}</option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                             </div>
                         </div>
                     </div>
 
                 <div class="float-right">
                     <x-search.table-search action="{{ route('candidates') }}" method="get" name="search"
-                        value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn" catVal="{{request('category')}}"/>
+                        value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn" catVal="{{request('candidate_role')}}" roleName="candidate_role"/>
                 </div>
                 <div class="card-body">
                     <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
@@ -58,12 +61,11 @@
                                     <td>{{ $info->candidate_name }}</td>
                                     <td>{{ $info->email }}</td>
                                     <td>{{ $info->contact }}</td>
-                                    <td>{{ $info->categories }}</td>
+                                    <td>{{ $info->candidateRole->candidate_role }}</td>
                                     <td>{{ $info->experience }}</td>
                                     <td>
                                         <div class="action-btns text-center" role="group">
-
-                                            <a href="{{ route('candidate.view', [$info->id]) }}"
+                                            <a href="{{ route('candidate.view',['candidate'=> $info->id ]) }}"
                                                 class="btn btn-primary waves-effect waves-light view">
                                                 <i class="ri-eye-line"></i>
                                             </a>
@@ -78,7 +80,7 @@
                                             </a>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="text-center">
                                         <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
                                             class="btn btn-primary btn-sm">Download</a>
 
@@ -98,11 +100,11 @@
 @push('script')
 <script>
     $(document).ready(function () {
-        $('#categories').on("change",function(){
+        $('#candidate_role_id').on("change",function(){
             let category = $(this).val()
             let url = "{{route('candidates')}}"
-            location.href = `${url}?category=${category}`
-           
+            location.href = `${url}?candidate_role=${category}`
+
         })
     });
 </script>

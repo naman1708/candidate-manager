@@ -30,6 +30,19 @@
 
                 {{-- users --}}
                 <li class="menu-title">Candidates</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="ri-account-circle-line account-box"></i>
+                        <span>Role</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{route('candidatesRoles')}}">View All</a></li>
+                        <li><a href="{{route('candidatesRole.add')}}">Add New</a></li>
+                    </ul>
+                </li>
+
+
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="ri-account-circle-line"></i>

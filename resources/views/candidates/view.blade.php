@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @push('page-title')
-<title>{{ "Candidates - ". $candidates['candidate_name'] }}</title>
+<title>{{ "Candidates - "}}</title>
 @endpush
 
 @push('heading')
@@ -19,47 +19,47 @@
         <div class="card">
             <h5 class="card-header">{{ 'Candidates Details' }}</h5>
             <div class="card-body">
-                
+
                 <h5 class="card-title">
-                    <span>Candidate Name :</span> 
+                    <span>Candidate Name :</span>
                     <span>
-                        {{ $candidates['candidate_name'] }} 
+                        {{ $candidate->candidate_name }}
                     </span>
                 </h5>
                 <hr>
                 <h5 class="card-title">
                     <span>Role : </span>
-                    <span>{{ $candidates->categories }}</span>
+                    <span>{{ $candidate->candidateRole->candidate_role }}</span>
                 </h5>
                 <hr/>
                 <h5 class="card-title">
                     <span>Date : </span>
-                    <span>{{ \Carbon\Carbon::parse($candidates->date)->format('d-M-Y') }}</span>
+                    <span>{{ \Carbon\Carbon::parse($candidate->date)->format('d-M-Y') }}</span>
 
                 </h5>
                 <hr/>
                 <h5 class="card-title">
                     <span>Source : </span>
-                    <span>{{ $candidates->source }}</span>
+                    <span>{{ $candidate->source }}</span>
                 </h5>
                 <hr/>
                 <h5 class="card-title">
                     <span>Experience: </span>
-                    <span>{{ $candidates->experience }}</span>
+                    <span>{{ $candidate->experience }}</span>
                 </h5>
                 <hr/>
                 <h5 class="card-title">
                     <span>Salary : </span>
-                    <span>{{ $candidates->salary }}</span>
+                    <span>{{ $candidate->salary }}</span>
                 </h5>
                 <hr/>
                 <h5 class="card-title">
                     <span>Expectation : </span>
-                    <span>{{ $candidates->expectation }}</span>
+                    <span>{{ $candidate->expectation }}</span>
                 </h5>
                 <hr>
-                
-                
+
+
             </div>
         </div>
     </div>
@@ -67,37 +67,37 @@
     <div class="col-lg-6">
         <div class="card">
             <h5 class="card-header">Contact Details</h5>
-            <div class="card-body">    
+            <div class="card-body">
                 <h5 class="card-title">
                     <span>Phone : </span>
-                    <span>{{ $candidates->contact }}</span>
+                    <span>{{ $candidate->contact }}</span>
                 </h5>
                 <hr>
-               
+
                 <h5 class="card-title">
                     <span>Email :</span>
-                    <span>{{ $candidates['email'] }}</span>
+                    <span>{{ $candidate['email'] }}</span>
                 </h5>
                 <hr>
 
                 <h5 class="card-title">
                     <span>Contact By :</span>
-                    <span>{{ $candidates['contact_by'] }}</span>
+                    <span>{{ $candidate['contact_by'] }}</span>
                 </h5>
                 <hr>
 
                 <h5 class="card-title">
                     <span>Status :</span>
-                    <span>{{ $candidates['status'] }}</span>
+                    <span>{{ $candidate['status'] }}</span>
                 </h5>
                 <hr>
 
                 <h5 class="card-title">
                     <span>Download Resume :</span>
-                    <a href="{{ route('download.resume', $candidates->id) }}" target="_blank" class="btn btn-primary">Download</a>
+                    <a href="{{ route('download.resume', $candidate->id) }}" target="_blank" class="btn btn-primary">Download</a>
                 </h5>
                 <hr>
-                
+
             </div>
         </div>
     </div>

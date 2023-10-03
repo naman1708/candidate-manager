@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('candidates', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('candidate_role_id');
             $table->string('candidate_name');
             $table->string('email')->unique();
-            $table->string('categories');
             $table->string('date');
             $table->string('source')->nullable();
             $table->string('experience');
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('expectation')->nullable();
             $table->string('upload_resume')->nullable();
             $table->timestamps();
+            $table->foreign('candidate_role_id')->references('id')->on('candidate_roles')->onDelete('cascade');
         });
     }
 

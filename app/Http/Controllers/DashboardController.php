@@ -12,8 +12,9 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $informations = Candidate::all();
+        $informations = Candidate::with('candidateRole')->get();
         $total['count'] = $informations->count();
+        $total['candidateRole'] = $informations->pluck('candidateRole')->count(); 
         return view('dashboard')->with(compact('total'));
     }
 }

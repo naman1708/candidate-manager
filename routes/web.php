@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\CandidateRolesController;
 use App\Http\Controllers\InvestorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InformationController;
@@ -31,18 +32,17 @@ Route::get('/', function () {
 
 
 // Admin Routes
-Route::middleware(['auth','role:admin'])->group(function() {
+Route::middleware(['auth', 'role:admin'])->group(function () {
+});
 
-});   
 
-
-Route::middleware(['auth','verified'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // dashboard
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    // User Profile  
-    Route::get('/logout', function( Request $request) {
+    // User Profile
+    Route::get('/logout', function (Request $request) {
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -61,13 +61,25 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/add-candidate', [CandidateController::class, 'store'])->name('candidate.save');
 
     Route::get('/edit-candidate/{candidate?}', [CandidateController::class, 'edit'])->name('candidate.edit');
-    Route::post('/edit-candidate', [CandidateController::class, 'update'])->name('candidate.update');
+    Route::post('/edit-candidate/{candidate?}', [CandidateController::class, 'update'])->name('candidate.update');
 
-    Route::get('/delete-candidate/{candidate?}',[CandidateController::class , 'destroy'])->name('candidate.delete');
+    Route::get('/delete-candidate/{candidate?}', [CandidateController::class, 'destroy'])->name('candidate.delete');
 
     Route::get('/download-resume/{resume?}', [CandidateController::class, 'downloadResume'])->name('download.resume');
 
+
+    // Candidate  Role routes
+
+    Route::get('/candidates-roles/{search?}/', [CandidateRolesController::class, 'index'])->name('candidatesRoles');
+
+    Route::get('/add-candidate-role', [CandidateRolesController::class, 'create'])->name('candidatesRole.add');
+    Route::post('/add-candidate-role', [CandidateRolesController::class, 'store'])->name('candidatesRole.save');
+
+    Route::get('/edit-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'edit'])->name('candidatesRole.edit');
+    Route::post('/edit-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'update'])->name('candidatesRole.update');
+
+    Route::get('/delete-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'destroy'])->name('candidatesRole.delete');
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

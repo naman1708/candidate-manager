@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Information extends Model
+class CandidateRoles extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'candidate_name','categories','date','source','date','experience','contact','email','status','salary','expectation','upload_resume'
-    
+        'candidate_role','status',
     ];
+    public function candidates()
+    {
+        return $this->hasMany(Candidate::class);
+    }
 }

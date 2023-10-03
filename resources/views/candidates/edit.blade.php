@@ -20,8 +20,8 @@
                 <form method="post" action="{{ route('candidate.update') }}" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="" value="{{$candidates->id}}">
                     @csrf
-                    <h4 class="card-title mb-3">{{__('Personal Details')}}</h4>      
-                    
+                    <h4 class="card-title mb-3">{{__('Personal Details')}}</h4>
+
                     <div class="row">
                         <div class="col-lg-6">
                            <x-form.input name="candidate_name" label="Candidate Name" :value="$candidates->candidate_name"/>
@@ -45,14 +45,24 @@
                     </div>
 
                     <div class="row">
+                        {{-- <div class="col-lg-6">
+                            <x-form.select name="candidate_role_id " label="Manager" :options="$managers" :selected="$investor->user->id"/>
+                        </div> --}}
+
                         <div class="col-lg-6">
-                            <x-form.select name="categories" label="Role" :options="[
-                                'PHP' => 'PHP',
-                                'Front end' => 'Front end',
-                                'Freshers' => 'Freshers',
-                                'HR' => 'HR',
-                                'BDE' => 'BDE',
-                            ]" :selected="$candidates->categories" />
+                            <div class="mb-3">
+                                <label for="">Role</label>
+                                <select name="candidate_role_id" id="candidate_role_id" class="form-control">
+                                    @foreach ($candidateRole as $canRole)
+                                        <option value="{{ $canRole->id }}"
+                                            {{ $canRole->id == $candidates->candidate_role_id ? 'selected' : '' }}>
+                                            {{ $canRole->candidate_role }}</option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="col-lg-6">

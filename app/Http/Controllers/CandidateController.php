@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Candidate;
+use App\Models\CandidateRoles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -15,36 +16,44 @@ class CandidateController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Candidate::query();
-        $category = $request->input('category');
+        $candidateRole = CandidateRoles::all();
+        $query = Candidate::with('candidateRole');
         $search = $request->input('search');
-        if (!empty($search) && !empty($category)) {
-            $query->where('categories', 'LIKE', "%$category%")
-                ->where(function ($query) use ($search) {
-                    $query->where('candidate_name', 'LIKE', "%$search%")
-                        ->orWhere('email', 'LIKE', "%$search%")
-                        ->orWhere('contact', 'LIKE', "%$search%")
-                        ->orWhere('experience', 'LIKE', "%$search%");
-                });
-        } elseif (empty($search) && !empty($category)) {
-            $query->where('categories', $category);
-        } elseif (!empty($search) && empty($category)) {
-            $query->where('candidate_name', 'LIKE', "%$search%")
-                ->orWhere('email', 'LIKE', "%$search%")
-                ->orWhere('contact', 'LIKE', "%$search%")
-                ->orWhere('categories', 'LIKE', "%$search%")
-                ->orWhere('experience', 'LIKE', "%$search%");
+        $role = $request->input('candidate_role');
+
+        if (!empty($search) && !empty($role)) {
+            $query->whereHas('candidateRole', function ($roleQuery) use ($role) {
+                $roleQuery->where('candidate_role', $role);
+            })->where(function ($query) use ($search) {
+                $query->where('candidate_name', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->orWhere('contact', 'LIKE', "%$search%")
+                    ->orWhere('experience', 'LIKE', "%$search%");
+            });
+        } elseif (empty($search) && !empty($role)) {
+            $query->whereHas('candidateRole', function ($roleQuery) use ($role) {
+                $roleQuery->where('candidate_role', $role);
+            });
+        } elseif (!empty($search) && empty($role)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('candidate_name', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->orWhere('contact', 'LIKE', "%$search%")
+                    ->orWhere('experience', 'LIKE', "%$search%");
+            });
         }
+
         $candidates = $query->paginate(10);
-        return view('candidates.all', compact('candidates'));
+        return view('candidates.all', compact('candidates', 'candidateRole'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('candidates.add');
+        $candidateRole = CandidateRoles::where('status', 'active')->get();
+        return view('candidates.add')->with(compact('candidateRole'));
     }
 
     /**
@@ -56,7 +65,7 @@ class CandidateController extends Controller
         $request->validate([
             'candidate_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:candidates,email'],
-            'categories' => ['required'],
+            'candidate_role_id' => ['required'],
             'date' => ['required'],
             'experience' => ['required'],
             'contact' => ['required', 'unique:candidates,contact'],
@@ -96,10 +105,9 @@ class CandidateController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($candidates)
+    public function show(Candidate $candidate)
     {
-        $candidates = Candidate::find($candidates);
-        return view('candidates.view')->with(compact('candidates'));
+        return view('candidates.view')->with(compact('candidate'));
     }
 
 
@@ -109,7 +117,8 @@ class CandidateController extends Controller
     public function edit($candidates)
     {
         $candidates = Candidate::find($candidates);
-        return view('candidates.edit')->with(compact('candidates'));
+        $candidateRole = CandidateRoles::where('status', 'active')->get();
+        return view('candidates.edit')->with(compact('candidates', 'candidateRole'));
     }
 
 
@@ -118,22 +127,23 @@ class CandidateController extends Controller
      */
     public function update(Request $request)
     {
-        
-            $request->validate([
-                'candidate_name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255'],
-                'categories' => ['required'],
-                'date' => ['required'],
-                'source' => ['required'],
-                'experience' => ['required'],
-                'contact' => [  'required',Rule::unique('candidates', 'contact')->ignore($request->id),
-                ],
-                'contact_by' => ['required'],
-                'status' => ['required'],
-                'salary' => ['required'],
-                'expectation' => ['required'],
-                // 'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
-            ]);
+
+        $request->validate([
+            'candidate_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'candidate_role_id' => ['required'],
+            'date' => ['required'],
+            'source' => ['required'],
+            'experience' => ['required'],
+            'contact' => [
+                'required', Rule::unique('candidates', 'contact')->ignore($request->id),
+            ],
+            'contact_by' => ['required'],
+            'status' => ['required'],
+            'salary' => ['required'],
+            'expectation' => ['required'],
+            // 'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
+        ]);
 
         DB::beginTransaction();
 
@@ -182,8 +192,6 @@ class CandidateController extends Controller
         DB::commit();
         return redirect()->back()->with('status', 'Candidate deleted successfully!');
     }
-    
-
 
     /**
      * Download resume the specified resource from storage.
@@ -193,22 +201,21 @@ class CandidateController extends Controller
         DB::beginTransaction();
         try {
             $candidate = Candidate::find($resume);
-    
+
             if (!$candidate) {
                 return redirect()->back()->with('status', 'Candidate not found.');
             }
-    
+
             $resumePath = $candidate->upload_resume;
-    
+
             if (!$resumePath || !Storage::disk('local')->exists($resumePath)) {
                 return redirect()->back()->with('status', 'Resume not found.');
             }
-    
+
             return Storage::download($resumePath);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('status', $e->getMessage());
         }
     }
-    
 }

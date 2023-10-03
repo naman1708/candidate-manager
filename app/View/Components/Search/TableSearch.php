@@ -11,8 +11,8 @@ class TableSearch extends Component
     /**
      * Create a new component instance.
      */
-    public $action, $method, $id, $name,$value, $class, $placeholder,$btn_type,$btnClass,$catVal;
-    public function __construct($action=null,$method=null,$id=null,$name=null,$value=null,$class=null,$placeholder="Search....",$btn_type="submit",$btnClass=null,$catVal=null)
+    public $action, $method, $id, $name,$value, $class, $placeholder,$btn_type,$btnClass,$catVal,$roleName;
+    public function __construct($action=null,$method=null,$id=null,$name=null,$value=null,$class=null,$placeholder="Search....",$btn_type="submit",$btnClass=null,$catVal=null,$roleName=null)
     {
         $this->action = $action;
         $this->method = $method;
@@ -24,6 +24,7 @@ class TableSearch extends Component
         $this->btn_type = $btn_type;
         $this->btnClass = $btnClass;
         $this->catVal = $catVal;
+        $this->roleName = $roleName;
     }
 
     /**
