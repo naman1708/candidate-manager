@@ -51,8 +51,16 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{route('candidates')}}">View All</a></li>
                         <li><a href="{{route('candidate.add')}}">Add New</a></li>
+                        <li><a href="{{route('candidate.importFileView')}}">Bulk Upload</a></li>
                     </ul>
                 </li>
+
+                {{-- <li>
+                    <a href="{{route('candidate.importFileView')}}" class="waves-effect">
+                        <i class="ri-account-circle-line"></i>
+                        <span>Bulk Upload</span>
+                    </a>
+                </li> --}}
 
 
             </ul>

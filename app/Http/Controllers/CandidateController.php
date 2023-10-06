@@ -221,6 +221,11 @@ class CandidateController extends Controller
     }
 
 
+    public function importFileView()
+    {
+        return view('candidates.import');
+    }
+
 
     /**
      * Candidate data Import .
@@ -228,6 +233,8 @@ class CandidateController extends Controller
 
     public function import(Request $request)
     {
+        // dd($request->all());
+
         $this->validate($request, [
             'file' => 'required|mimes:csv,xlsx',
         ]);
@@ -237,7 +244,6 @@ class CandidateController extends Controller
 
             $file = $request->file('file');
             Excel::import(new CandidatesImport, $file);
-            
         } catch (Exception $e) {
             return redirect()->back()->with('status', $e->getMessage());
         }

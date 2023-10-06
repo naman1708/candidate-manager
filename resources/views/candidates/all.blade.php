@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <form action="{{ route('candidate.import') }}" method="POST" enctype="multipart/form-data">
+                <form action="#" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="row justify-content container mt-4">
                         {{-- Filter role div start --}}
@@ -37,20 +37,6 @@
                                 @enderror
                             </div>
                         </div> {{-- Filter role div end --}}
-
-                        {{-- IMPORT EXPORT CANDIDATE --}}
-                        <div class="col-lg-4">
-                            <x-form.input name="file" label="Upload Excel File" type="file" />
-                        </div>
-
-                        <div class="col-lg-2 mt-lg-4">
-                            <button class="btn btn-info mb-lg-4" type="submit">{{ __('File Import') }}</button>
-                        </div>
-                        <div class="col-lg-2 mt-lg-4">
-                            <a href="{{ route('candidate.export') }}" class="btn btn-success">{{ __('File Export') }}</a>
-                        </div>
-                        {{-- IMPORT EXPORT CANDIDATE end div --}}
-
                     </div>
                 </form>
 
@@ -101,11 +87,14 @@
                                             </a>
                                         </div>
                                     </td>
-                                    <td class="text-center">
-                                        <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
-                                            class="btn btn-primary btn-sm">Download</a>
-
-                                    </td>
+                                    @if ($info->upload_resume)
+                                        <td class="text-center">
+                                            <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
+                                                class="btn btn-primary btn-sm">
+                                                <i class="ri-download-cloud-fill"></i>
+                                            </a>
+                                        </td>
+                                    @endif
 
                                 </tr>
                             @endforeach

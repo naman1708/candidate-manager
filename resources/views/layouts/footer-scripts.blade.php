@@ -39,4 +39,7 @@
 
         <script src="{{ url('assets/js/app.js') }}"></script>
 
+        <!-- Plugins js -->
+        <script src="{{url('assets/libs/dropzone/min/dropzone.min.js')}}"></script>
+
         @stack('script')

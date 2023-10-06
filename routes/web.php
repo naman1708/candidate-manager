@@ -67,6 +67,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/download-resume/{resume?}', [CandidateController::class, 'downloadResume'])->name('download.resume');
 
+    Route::get('import-candidate', [CandidateController::class, 'importFileView'])->name('candidate.importFileView');
+
     Route::post('import-candidate', [CandidateController::class, 'import'])->name('candidate.import');
     Route::get('export-candidate', [CandidateController::class, 'export'])->name('candidate.export');
 
