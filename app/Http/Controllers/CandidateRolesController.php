@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CandidatesExport;
+use App\Imports\CandidatesImport;
 use App\Models\Candidate;
 use App\Models\CandidateRoles;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CandidateRolesController extends Controller
 {
@@ -55,7 +59,6 @@ class CandidateRolesController extends Controller
                 'candidate_role' => $request->candidate_role,
                 'status' => $request->role_status,
             ]);
-
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('status', $e->getMessage());
@@ -78,10 +81,11 @@ class CandidateRolesController extends Controller
     /**
      * Update the specified resource.
      */
-    public function update(Request $request , CandidateRoles $candidatesRole)
+    public function update(Request $request, CandidateRoles $candidatesRole)
     {
         $request->validate([
-            'candidate_role' => ['required', Rule::unique('candidates', 'contact')->ignore($request->id),
+            'candidate_role' => [
+                'required', Rule::unique('candidates', 'contact')->ignore($request->id),
             ],
         ]);
         DB::beginTransaction();
@@ -116,4 +120,36 @@ class CandidateRolesController extends Controller
         return redirect()->back()->with('status', 'Candidate Role deleted successfully!');
     }
 
+
+    /**
+     * Candidate data Import .
+     */
+
+    public function import(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xlsx',
+        ]);
+
+        DB::beginTransaction();
+        try {
+
+            $file = $request->file('file');
+
+            Excel::import(new CandidatesImport, $file);
+        } catch (Exception $e) {
+            return redirect()->back()->with('status', $e->getMessage());
+        }
+        DB::commit();
+        return redirect()->back()->with('status', 'Candidates imported successfully.');
+    }
+
+    /**
+     * Candidate Data Export .
+     */
+
+    public function export()
+    {
+        return Excel::download(new CandidatesExport, 'Candidates.xlsx');
+    }
 }

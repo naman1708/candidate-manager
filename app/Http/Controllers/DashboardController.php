@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Candidate;
+use App\Models\CandidateRoles;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -12,9 +13,8 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $informations = Candidate::with('candidateRole')->get();
-        $total['count'] = $informations->count();
-        $total['candidateRole'] = $informations->pluck('candidateRole')->count(); 
+        $total['candidate'] = Candidate::count();
+        $total['candidatesRole'] = CandidateRoles::count();
         return view('dashboard')->with(compact('total'));
     }
 }

@@ -67,6 +67,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/download-resume/{resume?}', [CandidateController::class, 'downloadResume'])->name('download.resume');
 
+    Route::post('import-candidate', [CandidateRolesController::class, 'import'])->name('candidate.import');
+    Route::get('export-candidate', [CandidateRolesController::class, 'export'])->name('candidate.export');
+
 
     // Candidate  Role routes
 
@@ -79,6 +82,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/edit-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'update'])->name('candidatesRole.update');
 
     Route::get('/delete-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'destroy'])->name('candidatesRole.delete');
+
+
 });
 
 

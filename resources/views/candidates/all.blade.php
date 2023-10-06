@@ -17,29 +17,50 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="mt-4 justify-content" style="padding-left: 30px; width:300px; ">
+                <form action="{{ route('candidate.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row justify-content container mt-4">
+                        {{-- Filter role div start --}}
+                        <div class="col-lg-4">
                             <div class="mb-3">
-                                <label for="">Role</label>
+                                <label for="">Role Filter</label>
                                 <select name="candidate_role_id" id="candidate_role_id" class="form-control">
                                     <option value="">All</option>
                                     @foreach ($candidateRole as $role)
-                                        <option value="{{ $role->candidate_role }}" {{request('candidate_role')==$role->candidate_role?'selected':''}}>{{ $role->candidate_role }}</option>
+                                        <option value="{{ $role->candidate_role }}"
+                                            {{ request('candidate_role') == $role->candidate_role ? 'selected' : '' }}>
+                                            {{ $role->candidate_role }}</option>
                                     @endforeach
                                 </select>
                                 @error('category_id')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
-                            </div>
-                        </div>
-                    </div>
+                        </div> {{-- Filter role div end --}}
 
-                <div class="float-right">
+                        {{-- IMPORT EXPORT CANDIDATE --}}
+                        <div class="col-lg-4">
+                            <x-form.input name="file" label="Upload Excel File" type="file" />
+                        </div>
+
+                        <div class="col-lg-2 mt-lg-4">
+                            <button class="btn btn-info mb-lg-4" type="submit">{{ __('File Import') }}</button>
+                        </div>
+                        <div class="col-lg-2 mt-lg-4">
+                            <a href="{{ route('candidate.export') }}" class="btn btn-success">{{ __('File Export') }}</a>
+                        </div>
+                        {{-- IMPORT EXPORT CANDIDATE end div --}}
+
+                    </div>
+                </form>
+
+                {{-- Search Query Start --}}
+                <div class="float-right container">
                     <x-search.table-search action="{{ route('candidates') }}" method="get" name="search"
-                        value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn" catVal="{{request('candidate_role')}}" roleName="candidate_role"/>
+                        value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn"
+                        catVal="{{ request('candidate_role') }}" roleName="candidate_role" />
                 </div>
+                {{-- Search Query End --}}
                 <div class="card-body">
                     <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -65,7 +86,7 @@
                                     <td>{{ $info->experience }}</td>
                                     <td>
                                         <div class="action-btns text-center" role="group">
-                                            <a href="{{ route('candidate.view',['candidate'=> $info->id ]) }}"
+                                            <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
                                                 class="btn btn-primary waves-effect waves-light view">
                                                 <i class="ri-eye-line"></i>
                                             </a>
@@ -98,14 +119,14 @@
 @endsection
 
 @push('script')
-<script>
-    $(document).ready(function () {
-        $('#candidate_role_id').on("change",function(){
-            let category = $(this).val()
-            let url = "{{route('candidates')}}"
-            location.href = `${url}?candidate_role=${category}`
+    <script>
+        $(document).ready(function() {
+            $('#candidate_role_id').on("change", function() {
+                let category = $(this).val()
+                let url = "{{ route('candidates') }}"
+                location.href = `${url}?candidate_role=${category}`
 
-        })
-    });
-</script>
+            })
+        });
+    </script>
 @endpush

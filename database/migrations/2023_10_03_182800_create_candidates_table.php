@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('candidate_role_id');
             $table->string('candidate_name');
             $table->string('email')->unique();
-            $table->string('date');
+            $table->date('date');
             $table->string('source')->nullable();
             $table->string('experience');
             $table->string('contact')->unique();
