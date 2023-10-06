@@ -20,10 +20,6 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="mb-2 float-right">
-                        <a href="{{ route('candidate.export') }}" class="btn btn-success">{{ __('File Export') }}</a>
-                    </div>
-
                     <form action="{{ route('candidate.import') }}" method="POST" enctype="multipart/form-data"
                         class="dropzone" id="image-upload">
                         @csrf
