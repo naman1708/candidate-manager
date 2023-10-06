@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\CandidatesExport;
-use App\Imports\CandidatesImport;
 use App\Models\Candidate;
 use App\Models\CandidateRoles;
 use Exception;
@@ -116,40 +114,12 @@ class CandidateRolesController extends Controller
             DB::rollBack();
             return redirect()->back()->with('status', 'Candidate cannot be deleted!');
         }
+        
         DB::commit();
         return redirect()->back()->with('status', 'Candidate Role deleted successfully!');
     }
 
 
-    /**
-     * Candidate data Import .
-     */
 
-    public function import(Request $request)
-    {
-        $this->validate($request, [
-            'file' => 'required|mimes:csv,xlsx',
-        ]);
 
-        DB::beginTransaction();
-        try {
-
-            $file = $request->file('file');
-
-            Excel::import(new CandidatesImport, $file);
-        } catch (Exception $e) {
-            return redirect()->back()->with('status', $e->getMessage());
-        }
-        DB::commit();
-        return redirect()->back()->with('status', 'Candidates imported successfully.');
-    }
-
-    /**
-     * Candidate Data Export .
-     */
-
-    public function export()
-    {
-        return Excel::download(new CandidatesExport, 'Candidates.xlsx');
-    }
 }

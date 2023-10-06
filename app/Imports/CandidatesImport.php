@@ -18,7 +18,6 @@ class CandidatesImport implements ToModel, WithHeadingRow
 {
     public function model(array $row)
     {
-        Log::info('Raw Data:', $row);
 
         $candidateRoleName = $row['candidate_role'];
         $candidateRole = CandidateRoles::where('candidate_role', $candidateRoleName)->first();
@@ -29,7 +28,7 @@ class CandidatesImport implements ToModel, WithHeadingRow
             $excelDate = (int)$excelDate;
             $dateIsValid = Carbon::createFromDate(1900, 1, 1)->addDays($excelDate - 2)->format('Y-m-d');
         } else {
-            Log::warning('Invalid date encountered: ' . (int)$excelDate);
+            // Log::warning('Invalid date encountered: ' . (int)$excelDate);
             $dateIsValid = $excelDate;
         }
 
@@ -48,18 +47,13 @@ class CandidatesImport implements ToModel, WithHeadingRow
             'upload_resume' => $row['resume'],
         ];
 
-        Log::info('Processed Data (Before Validation):', $candidateData);
-
         $existingCandidate = Candidate::where('contact', (string)$row['contact'])->first();
-
         if ($existingCandidate) {
             $existingCandidate->update($candidateData);
-            Log::info('Record Updated:', $candidateData);
         } else {
             Candidate::create($candidateData);
-            Log::info('Record Inserted:', $candidateData);
         }
     }
-    
+
 }
 

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CandidatesExport;
+use App\Imports\CandidatesImport;
 use App\Models\Candidate;
 use App\Models\CandidateRoles;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CandidateController extends Controller
 {
@@ -94,8 +98,7 @@ class CandidateController extends Controller
             Candidate::create($data);
         } catch (\Exception $e) {
             DB::rollback();
-            dd("rollback", $e->getMessage());
-            return redirect()->back()->with('status', 'Something went wrong!');
+            return redirect()->back()->with('status', $e->getMessage());
         }
 
         DB::commit();
@@ -170,7 +173,7 @@ class CandidateController extends Controller
             $candidates->update($data);
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('status', 'Something went wrong!');
+            return redirect()->back()->with('status', $e->getMessage());
         }
 
         DB::commit();
@@ -201,13 +204,11 @@ class CandidateController extends Controller
         DB::beginTransaction();
         try {
             $candidate = Candidate::find($resume);
-
             if (!$candidate) {
                 return redirect()->back()->with('status', 'Candidate not found.');
             }
 
             $resumePath = $candidate->upload_resume;
-
             if (!$resumePath || !Storage::disk('local')->exists($resumePath)) {
                 return redirect()->back()->with('status', 'Resume not found.');
             }
@@ -217,5 +218,39 @@ class CandidateController extends Controller
             DB::rollBack();
             return redirect()->back()->with('status', $e->getMessage());
         }
+    }
+
+
+
+    /**
+     * Candidate data Import .
+     */
+
+    public function import(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:csv,xlsx',
+        ]);
+
+        DB::beginTransaction();
+        try {
+
+            $file = $request->file('file');
+            Excel::import(new CandidatesImport, $file);
+            
+        } catch (Exception $e) {
+            return redirect()->back()->with('status', $e->getMessage());
+        }
+        DB::commit();
+        return redirect()->back()->with('status', 'Candidates imported successfully.');
+    }
+
+    /**
+     * Candidate Data Export .
+     */
+
+    public function export()
+    {
+        return Excel::download(new CandidatesExport, 'Candidates.xlsx');
     }
 }
