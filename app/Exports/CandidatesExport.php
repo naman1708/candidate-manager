@@ -12,14 +12,16 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Maatwebsite\Excel\Concerns\Exportable;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-
-
-class CandidatesExport implements FromCollection, WithHeadings, WithStrictNullComparison, ShouldAutoSize, WithEvents
+class CandidatesExport implements FromCollection, WithHeadings, WithStrictNullComparison, ShouldAutoSize, WithEvents, WithStyles, WithTitle
 {
-    /**
-     * @return \Illuminate\Support\Collection
-     */
+    use Exportable;
 
     public function collection()
     {
@@ -66,9 +68,9 @@ class CandidatesExport implements FromCollection, WithHeadings, WithStrictNullCo
     public function registerEvents(): array
     {
         return [
-            $styleArray =  AfterSheet::class => function (AfterSheet $event) {
-                // Apply styling
-                $event->sheet->getStyle('1')->applyFromArray([
+            AfterSheet::class => function (AfterSheet $event) {
+                // Apply styling to the headings
+                $event->sheet->getStyle('A1:L1')->applyFromArray([
                     'font' => [
                         'bold' => true,
                     ],
@@ -80,5 +82,16 @@ class CandidatesExport implements FromCollection, WithHeadings, WithStrictNullCo
                 ]);
             },
         ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            '1' => ['font' => ['bold' => true]],
+        ];
+    }
+    public function title(): string
+    {
+        return 'Candidates';
     }
 }

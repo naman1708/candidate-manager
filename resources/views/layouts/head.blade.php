@@ -41,7 +41,9 @@
 
 
     <!-- Plugins css -->
-    <link href="{{url('assets/libs/dropzone/min/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
+    {{-- <link href="{{url('assets/libs/dropzone/min/dropzone.min.css')}}" rel="stylesheet" type="text/css" /> --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
+
 
 
 

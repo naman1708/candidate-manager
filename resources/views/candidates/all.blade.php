@@ -17,36 +17,19 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <form action="#" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="row justify-content container mt-4">
-                        {{-- Filter role div start --}}
-                        <div class="col-lg-4">
-                            <div class="mb-3">
-                                <label for="">Role Filter</label>
-                                <select name="candidate_role_id" id="candidate_role_id" class="form-control">
-                                    <option value="">All</option>
-                                    @foreach ($candidateRole as $role)
-                                        <option value="{{ $role->candidate_role }}"
-                                            {{ request('candidate_role') == $role->candidate_role ? 'selected' : '' }}>
-                                            {{ $role->candidate_role }}</option>
-                                    @endforeach
-                                </select>
-                                @error('category_id')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div> {{-- Filter role div end --}}
-                    </div>
-                </form>
+                <div class="row container mt-4 mb-4" style="display:flex; justify-content: space-between;">
 
-                {{-- Search Query Start --}}
-                <div class="float-right container">
-                    <x-search.table-search action="{{ route('candidates') }}" method="get" name="search"
-                        value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn"
-                        catVal="{{ request('candidate_role') }}" roleName="candidate_role" />
+                    <div class="col-lg-5 mx-1">
+                        <x-form.select label="Role Filter" chooseFileComment="All" name="candidate_role_id" :options="$candidateRole"
+                            :selected="$selectedRole" />
+                    </div>
+                    <div class="col-lg-4 mt-1 mr-3">
+                        <x-search.table-search action="{{ route('candidates') }}" method="get" name="search"
+                            value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn"
+                            catVal="{{ request('candidate_role') }}" roleName="candidate_role" />
+                    </div>
                 </div>
-                {{-- Search Query End --}}
+
                 <div class="card-body">
                     <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -87,15 +70,19 @@
                                             </a>
                                         </div>
                                     </td>
-                                    @if ($info->upload_resume)
-                                        <td class="text-center">
-                                            <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
-                                                class="btn btn-primary btn-sm">
-                                                <i class="ri-download-cloud-fill"></i>
-                                            </a>
-                                        </td>
+                                    @if (!empty($info->upload_resume))
+                                        @php
+                                            $resumePath = $info->upload_resume;
+                                        @endphp
+                                        @if (Storage::disk('local')->exists($resumePath))
+                                            <td class="text-center">
+                                                <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
+                                                    class="btn btn-primary btn-sm">
+                                                    <i class="ri-download-cloud-fill"></i>
+                                                </a>
+                                            </td>
+                                        @endif
                                     @endif
-
                                 </tr>
                             @endforeach
                         </tbody>
@@ -108,7 +95,7 @@
 @endsection
 
 @push('script')
-    <script>
+    {{-- <script>
         $(document).ready(function() {
             $('#candidate_role_id').on("change", function() {
                 let category = $(this).val()
@@ -116,6 +103,23 @@
                 location.href = `${url}?candidate_role=${category}`
 
             })
+        });
+    </script> --}}
+
+
+    <script>
+        $(document).ready(function() {
+            $('#candidate_role_id').on("change", function() {
+                let category = $(this).val();
+                let url = "{{ route('candidates') }}";
+
+                // Append the role filter to the existing search query parameters
+                let search = new URLSearchParams(window.location.search);
+                search.set('candidate_role', category);
+
+                // Redirect to the updated URL
+                window.location.href = `${url}?${search.toString()}`;
+            });
         });
     </script>
 @endpush

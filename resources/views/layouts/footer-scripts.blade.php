@@ -40,6 +40,6 @@
         <script src="{{ url('assets/js/app.js') }}"></script>
 
         <!-- Plugins js -->
-        <script src="{{url('assets/libs/dropzone/min/dropzone.min.js')}}"></script>
-
+        {{-- <script src="{{url('assets/libs/dropzone/min/dropzone.min.js')}}"></script> --}}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
         @stack('script')

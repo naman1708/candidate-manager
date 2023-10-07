@@ -11,14 +11,15 @@ class Select extends Component
     /**
      * Create a new component instance.
      */
-    public $name,$label,$options , $values , $selected;
-    public function __construct($name, $label, $options=[] , $selected = null)
-    {   
+    public $name,$label,$options , $values , $selected,$chooseFileComment;
+    public function __construct($name, $label, $options=[] , $selected = null,$chooseFileComment="--Select Option--",)
+    {
         $this->name = $name;
         $this->label = $label;
         $this->options = $options;
         $this->values =  array_keys($options);
         $this->selected = $selected;
+        $this->chooseFileComment = $chooseFileComment;
     }
 
     /**

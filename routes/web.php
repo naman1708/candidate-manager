@@ -73,6 +73,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('export-candidate', [CandidateController::class, 'export'])->name('candidate.export');
 
 
+    Route::get('download-sampleCsv-candidate', [CandidateController::class, 'downloadSampleCsv'])->name('candidate.downloadSampleCsv');
+
+
     // Candidate  Role routes
 
     Route::get('/candidates-roles/{search?}/', [CandidateRolesController::class, 'index'])->name('candidatesRoles');

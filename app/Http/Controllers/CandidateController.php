@@ -12,33 +12,23 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Response;
+
 
 class CandidateController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
     public function index(Request $request)
     {
-        $candidateRole = CandidateRoles::all();
+        $candidateRole = CandidateRoles::pluck('candidate_role', 'id')->toArray();
         $query = Candidate::with('candidateRole');
+
         $search = $request->input('search');
         $role = $request->input('candidate_role');
-
-        if (!empty($search) && !empty($role)) {
-            $query->whereHas('candidateRole', function ($roleQuery) use ($role) {
-                $roleQuery->where('candidate_role', $role);
-            })->where(function ($query) use ($search) {
-                $query->where('candidate_name', 'LIKE', "%$search%")
-                    ->orWhere('email', 'LIKE', "%$search%")
-                    ->orWhere('contact', 'LIKE', "%$search%")
-                    ->orWhere('experience', 'LIKE', "%$search%");
-            });
-        } elseif (empty($search) && !empty($role)) {
-            $query->whereHas('candidateRole', function ($roleQuery) use ($role) {
-                $roleQuery->where('candidate_role', $role);
-            });
-        } elseif (!empty($search) && empty($role)) {
+        if (!empty($search)) {
             $query->where(function ($query) use ($search) {
                 $query->where('candidate_name', 'LIKE', "%$search%")
                     ->orWhere('email', 'LIKE', "%$search%")
@@ -46,9 +36,15 @@ class CandidateController extends Controller
                     ->orWhere('experience', 'LIKE', "%$search%");
             });
         }
-
+        if (!empty($role)) {
+            $selectedRole = $role; // the selected role
+            $query->where('candidate_role_id', $role);
+        } else {
+            $selectedRole = null; // No role selected
+        }
         $candidates = $query->paginate(10);
-        return view('candidates.all', compact('candidates', 'candidateRole'));
+
+        return view('candidates.all', compact('candidates', 'candidateRole', 'selectedRole'));
     }
 
     /**
@@ -56,7 +52,7 @@ class CandidateController extends Controller
      */
     public function create(Request $request)
     {
-        $candidateRole = CandidateRoles::where('status', 'active')->get();
+        $candidateRole = CandidateRoles::where('status', 'active')->pluck('candidate_role', 'id')->toArray();
         return view('candidates.add')->with(compact('candidateRole'));
     }
 
@@ -74,24 +70,17 @@ class CandidateController extends Controller
             'experience' => ['required'],
             'contact' => ['required', 'unique:candidates,contact'],
             'status' => ['required'],
-            // 'contact_by' => ['required'],
-            // 'salary' => ['required'],
-            // 'expectation' => ['required'],
-            // 'source' => ['required'],
-            // 'upload_resume' => ['required'],
+            'contact_by' => ['required'],
         ]);
 
         DB::beginTransaction();
         try {
             $data = $request->all();
-            // if ($request->hasFile('upload_resume')) {
-            //     $resumePath = $request->file('upload_resume')->store('resumes', 'local');
-            //     $data['upload_resume'] = $resumePath;
-            // }
             if ($request->hasFile('upload_resume')) {
                 $uploadedFile = $request->file('upload_resume');
-                $originalFileName = $uploadedFile->getClientOriginalName();
-                $resumePath = $uploadedFile->storeAs('resumes', $originalFileName, 'local');
+                $extension = $uploadedFile->getClientOriginalExtension();
+                $randomFileName = time() . '_' . uniqid() . '.' . $extension;
+                $resumePath = $uploadedFile->storeAs('resumes', $randomFileName, 'local');
                 $data['upload_resume'] = $resumePath;
             }
 
@@ -120,7 +109,7 @@ class CandidateController extends Controller
     public function edit($candidates)
     {
         $candidates = Candidate::find($candidates);
-        $candidateRole = CandidateRoles::where('status', 'active')->get();
+        $candidateRole = CandidateRoles::where('status', 'active')->pluck('candidate_role', 'id')->toArray();;
         return view('candidates.edit')->with(compact('candidates', 'candidateRole'));
     }
 
@@ -144,8 +133,7 @@ class CandidateController extends Controller
             'contact_by' => ['required'],
             'status' => ['required'],
             'salary' => ['required'],
-            'expectation' => ['required'],
-            // 'upload_resume' => ['file', 'mimes:pdf,doc,docx'],
+            'expectation' => ['required']
         ]);
 
         DB::beginTransaction();
@@ -156,8 +144,9 @@ class CandidateController extends Controller
 
             if ($request->hasFile('upload_resume')) {
                 $uploadedFile = $request->file('upload_resume');
-                $originalFileName = $uploadedFile->getClientOriginalName();
-                $resumePath = $uploadedFile->storeAs('resumes', $originalFileName, 'local');
+                $extension = $uploadedFile->getClientOriginalExtension();
+                $randomFileName = time() . '_' . uniqid() . '.' . $extension;
+                $resumePath = $uploadedFile->storeAs('resumes', $randomFileName, 'local');
 
                 if (!$uploadedFile->isValid()) {
                     return redirect()->back()->with('status', 'There was an error uploading the resume file.');
@@ -233,23 +222,29 @@ class CandidateController extends Controller
 
     public function import(Request $request)
     {
-        // dd($request->all());
-
         $this->validate($request, [
-            'file' => 'required|mimes:csv,xlsx',
+            'file' => 'required|mimes:csv,xlsx,xls',
         ]);
 
         DB::beginTransaction();
         try {
-
             $file = $request->file('file');
-            Excel::import(new CandidatesImport, $file);
+            $import = new CandidatesImport();
+            Excel::import($import, $file);
+            $newCandidatesCount = $import->getNewCandidatesCount();
+            $updatedCandidatesCount = $import->getUpdatedCandidatesCount();
+            $totalCandidatesCount = $newCandidatesCount + $updatedCandidatesCount;
+            $uploadedFileName = $file->getClientOriginalName();
         } catch (Exception $e) {
-            return redirect()->back()->with('status', $e->getMessage());
+            DB::rollBack();
+            return response()->json(['message' => 'File import failed: ' . $e->getMessage()]);
         }
+
         DB::commit();
-        return redirect()->back()->with('status', 'Candidates imported successfully.');
+        $message = "File <strong>'{$uploadedFileName}'</strong> successfully imported. <strong>{$newCandidatesCount}</strong> new candidates added and <strong>{$updatedCandidatesCount}</strong> updated from <strong>{$totalCandidatesCount}</strong> records.";
+        return response()->json(['message' => $message]);
     }
+
 
     /**
      * Candidate Data Export .
@@ -257,6 +252,24 @@ class CandidateController extends Controller
 
     public function export()
     {
-        return Excel::download(new CandidatesExport, 'Candidates.xlsx');
+        return Excel::download(new CandidatesExport, 'Candidates.csv');
     }
+
+
+    /**
+     * Download Sample CSV Candidate
+     */
+    public function downloadSampleCsv()
+    {
+        DB::beginTransaction();
+            $filePath = storage_path('app/public/sample.csv');
+            $fileName = 'sample.csv';
+            if (file_exists($filePath)) {
+                return response()->download($filePath, $fileName, [
+                    'Content-Type' => 'application/csv',
+                    'Content-Disposition' => 'attachment; filename=' . $fileName,
+                ]);
+            }
+            return redirect()->back()->with('status', 'Sample CSV file Not Found.');
+        }
 }
