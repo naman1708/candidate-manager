@@ -5,8 +5,7 @@
 @endpush
 
 @push('heading')
-    {{ __('Sample CSV') }}
-    <a href="{{route('candidate.downloadSampleCsv')}}" class="btn btn-link">John Doe</a>
+    <a href="{{route('candidate.downloadSampleCsv')}}" class="btn btn-link">Sample CSV</a>
 
 @endpush
 

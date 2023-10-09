@@ -39,7 +39,7 @@ class CandidatesImport implements ToModel, WithHeadingRow
         }
 
         $candidateData = [
-            'candidate_role_id' => $candidateRole ? $candidateRole->id : null,
+            'candidate_role_id' => $candidateRole ? $candidateRole->id : Null,
             'candidate_name' => $row['candidate_name'],
             'email' => $row['email'],
             'date' => (string)$dateIsValid,

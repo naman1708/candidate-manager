@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('candidates', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('candidate_role_id');
+            $table->unsignedBigInteger('candidate_role_id')->nullable();
             $table->string('candidate_name');
             $table->string('email')->unique();
             $table->date('date');

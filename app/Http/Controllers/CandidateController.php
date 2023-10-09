@@ -65,7 +65,7 @@ class CandidateController extends Controller
         $request->validate([
             'candidate_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:candidates,email'],
-            'candidate_role_id' => ['required'],
+            // 'candidate_role_id' => ['required'],
             'date' => ['required'],
             'experience' => ['required'],
             'contact' => ['required', 'unique:candidates,contact'],
@@ -123,7 +123,7 @@ class CandidateController extends Controller
         $request->validate([
             'candidate_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
-            'candidate_role_id' => ['required'],
+            // 'candidate_role_id' => ['required'],
             'date' => ['required'],
             'source' => ['required'],
             'experience' => ['required'],

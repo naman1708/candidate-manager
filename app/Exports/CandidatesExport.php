@@ -33,7 +33,7 @@ class CandidatesExport implements FromCollection, WithHeadings, WithStrictNullCo
                 'Contact' => $candidate->contact,
                 'Email' => $candidate->email,
                 'Contact By' => $candidate->contact_by,
-                'Candidate Role' => $candidate->candidateRole->candidate_role,
+                'Candidate Role' => $candidate->candidateRole->candidate_role ?? 'N/A',
                 'Date' => $candidate->date,
                 'Source' => $candidate->source,
                 'Experience' => $candidate->experience,

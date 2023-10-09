@@ -51,7 +51,7 @@
                                     <td>{{ $info->candidate_name }}</td>
                                     <td>{{ $info->email }}</td>
                                     <td>{{ $info->contact }}</td>
-                                    <td>{{ $info->candidateRole->candidate_role }}</td>
+                                    <td>{{ $info->candidateRole->candidate_role ?? 'Null' }}</td>
                                     <td>{{ $info->experience }}</td>
                                     <td>
                                         <div class="action-btns text-center" role="group">
