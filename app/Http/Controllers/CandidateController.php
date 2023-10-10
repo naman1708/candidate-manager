@@ -17,6 +17,15 @@ use Illuminate\Support\Facades\Response;
 
 class CandidateController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:candidate-list|candidate-view|candidate-create|candidate-edit|candidate-delete', ['only' => ['index', 'show']]);
+        $this->middleware('permission:candidate-view', ['only' => ['show']]);
+        $this->middleware('permission:candidate-create', ['only' => ['create', 'store']]);
+        $this->middleware('permission:candidate-edit', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:candidate-delete', ['only' => ['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -66,11 +75,11 @@ class CandidateController extends Controller
             'candidate_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:candidates,email'],
             // 'candidate_role_id' => ['required'],
-            'date' => ['required'],
-            'experience' => ['required'],
+            // 'date' => ['required'],
+            // 'experience' => ['required'],
             'contact' => ['required', 'unique:candidates,contact'],
-            'status' => ['required'],
-            'contact_by' => ['required'],
+            // 'status' => ['required'],
+            // 'contact_by' => ['required'],
         ]);
 
         DB::beginTransaction();
@@ -124,16 +133,16 @@ class CandidateController extends Controller
             'candidate_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
             // 'candidate_role_id' => ['required'],
-            'date' => ['required'],
-            'source' => ['required'],
-            'experience' => ['required'],
+            // 'date' => ['required'],
+            // 'source' => ['required'],
+            // 'experience' => ['required'],
             'contact' => [
                 'required', Rule::unique('candidates', 'contact')->ignore($request->id),
             ],
-            'contact_by' => ['required'],
-            'status' => ['required'],
-            'salary' => ['required'],
-            'expectation' => ['required']
+            // 'contact_by' => ['required'],
+            // 'status' => ['required'],
+            // 'salary' => ['required'],
+            // 'expectation' => ['required']
         ]);
 
         DB::beginTransaction();
@@ -256,20 +265,86 @@ class CandidateController extends Controller
     }
 
 
+    // public function export(Request $request)
+    // {
+    //     $selectedCandidates = $request->input('selectedCandidates', []);
+    //     $candidates = Candidate::with('candidateRole')
+    //         ->whereIn('id', $selectedCandidates)
+    //         ->get();
+
+    //     $data = $candidates->map(function ($candidate) {
+    //         return [
+    //             'Candidate Name' => $candidate->candidate_name,
+    //             'Contact' => $candidate->contact,
+    //             'Email' => $candidate->email,
+    //             'Contact By' => $candidate->contact_by,
+    //             'Candidate Role' => $candidate->candidateRole->candidate_role ?? 'N/A',
+    //             'Date' => $candidate->date,
+    //             'Source' => $candidate->source,
+    //             'Experience' => $candidate->experience,
+    //             'Salary' => $candidate->salary,
+    //             'Expectation' => $candidate->expectation,
+    //             'Status' => $candidate->status,
+    //             'Resume' => $candidate->upload_resume,
+    //         ];
+    //     });
+
+    //     return Excel::download(new CandidatesExport, 'SelectedCandidates.csv');
+    // }
+
+
+    public function selectedCandidateExport(Request $request)
+    {
+        dd($request->all());
+        $selectedCandidates = explode(',', $request->input('selectedCandidates'));
+        $candidates = Candidate::with('candidateRole')
+            ->whereIn('id', $selectedCandidates)->get();
+
+        return Excel::download(new CandidatesExport, 'SelectedCandidates.csv');
+    }
+
+
+
     /**
      * Download Sample CSV Candidate
      */
     public function downloadSampleCsv()
     {
         DB::beginTransaction();
-            $filePath = storage_path('app/public/sample.csv');
-            $fileName = 'sample.csv';
-            if (file_exists($filePath)) {
-                return response()->download($filePath, $fileName, [
-                    'Content-Type' => 'application/csv',
-                    'Content-Disposition' => 'attachment; filename=' . $fileName,
-                ]);
-            }
-            return redirect()->back()->with('status', 'Sample CSV file Not Found.');
+        $filePath = storage_path('app/public/sample.csv');
+        $fileName = 'sample.csv';
+        if (file_exists($filePath)) {
+            return response()->download($filePath, $fileName, [
+                'Content-Type' => 'application/csv',
+                'Content-Disposition' => 'attachment; filename=' . $fileName,
+            ]);
         }
+        return redirect()->back()->with('status', 'Sample CSV file Not Found.');
+    }
+
+
+    public function uploadResumeView()
+    {
+        return view('candidates.uploadResume');
+    }
+
+
+    public function uploadResume(Request $request)
+    {
+        $request->validate([
+            'file' => 'required',
+        ]);
+        // dd($request->all());
+        // foreach ($request->file('file') as $file) {
+        //     $randomFileName = uniqid() . '.' . $file->getClientOriginalExtension();
+        //     $resumePath = $file->storeAs('resumes', $randomFileName, 'local');
+        // }
+
+        foreach ($request->file('file') as $file) {
+            $resumePath = $file->store('resumes', 'local');
+        }
+
+        // return response()->json(['message' => 'Files uploaded successfully']);
+        return redirect()->back()->with('status', "Resume uploaded successfully");
+    }
 }

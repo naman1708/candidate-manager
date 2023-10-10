@@ -16,12 +16,12 @@ return new class extends Migration
             $table->unsignedBigInteger('candidate_role_id')->nullable();
             $table->string('candidate_name');
             $table->string('email')->unique();
-            $table->date('date');
+            $table->date('date')->nullable();
             $table->string('source')->nullable();
-            $table->string('experience');
+            $table->string('experience')->nullable();
             $table->string('contact')->unique();
-            $table->string('contact_by');
-            $table->string('status');
+            $table->string('contact_by')->nullable();
+            $table->string('status')->nullable();
             $table->string('salary')->nullable();
             $table->string('expectation')->nullable();
             $table->string('upload_resume')->nullable();

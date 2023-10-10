@@ -9,7 +9,9 @@ use App\Http\Controllers\InvestmentController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
 use App\Models\Investor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +34,13 @@ Route::get('/', function () {
 
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin'])->group(function () {
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+// });
+
+
+Route::group(['middleware' => ['auth','role:admin']], function () {
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
 });
 
 
@@ -70,10 +78,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('import-candidate', [CandidateController::class, 'importFileView'])->name('candidate.importFileView');
 
     Route::post('import-candidate', [CandidateController::class, 'import'])->name('candidate.import');
-    Route::get('export-candidate', [CandidateController::class, 'export'])->name('candidate.export');
+
+    Route::get('export-candidate/', [CandidateController::class, 'export'])->name('candidate.export');
+    Route::post('selected-export-candidate/', [CandidateController::class, 'selectedCandidateExport'])->name('candidate.selectedCandidateExport');
 
 
     Route::get('download-sampleCsv-candidate', [CandidateController::class, 'downloadSampleCsv'])->name('candidate.downloadSampleCsv');
+
+
+    Route::get('upload-resumes/', [CandidateController::class, 'uploadResumeView'])->name('candidate.uploadResumeView');
+    Route::post('upload-candidate-resumes/', [CandidateController::class, 'uploadResume'])->name('candidate.uploadResume');
+
+
+
+
 
 
     // Candidate  Role routes
@@ -90,6 +108,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 });
+
+
 
 
 require __DIR__ . '/auth.php';

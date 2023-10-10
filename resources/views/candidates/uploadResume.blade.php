@@ -1,12 +1,11 @@
 @extends('layouts.main')
 
 @push('page-title')
-    <title>{{ __('Bulk Upload Candidates') }} </title>
+    <title>{{ __('Upload Candidates Resume') }} </title>
 @endpush
 
 @push('heading')
-    <a href="{{route('candidate.downloadSampleCsv')}}" class="btn btn-link">Sample CSV</a>
-
+    {{ __('Upload Candidates Resume') }}
 @endpush
 
 @push('style')
@@ -15,7 +14,7 @@
 @section('content')
     <x-status-message />
     <div id="successMessage" style="display: none;" class="alert alert-success mt-3">
-        File import successful!
+        File upload successful!
     </div>
     <div id="errorMessage" style="display: none;" class="alert alert-danger mt-3">
     </div>
@@ -24,30 +23,53 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('candidate.import') }}" method="POST" enctype="multipart/form-data"
+                    {{--
+                    <form action="{{ route('candidate.uploadResume') }}" method="POST" enctype="multipart/form-data"
                         class="dropzone" id="file-upload">
                         @csrf
                         <div class="dz-message needsclick">
                             <div class="mb-3">
                                 <i class="display-4 text-muted ri-upload-cloud-2-line"></i>
                             </div>
-                            <h4>Drop Csv files here or click to upload Candidate Csv file.</h4>
+                            <h4>Drop Resume files here or click to upload Candidate Resume file.</h4>
                         </div>
-
                     </form>
                     <div class="text-center mt-4">
                         <button type="submit" id="uploadFile" class="btn btn-primary waves-effect waves-light">Import
                             File</button>
-                    </div>
+                    </div> --}}
+
+
+
+                    <form action="{{ route('candidate.uploadResume') }}" method="POST" enctype="multipart/form-data"
+                        class="" id="">
+                        @csrf
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <input type="file" name="file[]" class="form-control" multiple>
+                                </div>
+                                    @error('file')
+                                    <span class="text-danger">{{$message}}</span>
+                                    @enderror
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <input type="submit" value="Upload Resume" class="btn btn-primary">
+                        </div>
+                    </form>
+
 
                 </div>
             </div>
         </div>
+
     </div>
 @endsection
 
 @push('script')
-    <script type="text/javascript">
+
+    {{-- <script type="text/javascript">
         Dropzone.autoDiscover = false;
         var myDropzone = new Dropzone("#file-upload", {
             url: "{{ route('candidate.import') }}",
@@ -107,6 +129,5 @@
             console.log(errorMessage);
             showErrorMessage(errorMessage);
         });
-    </script>
-
+    </script> --}}
 @endpush
