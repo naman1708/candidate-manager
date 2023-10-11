@@ -25,32 +25,33 @@ class CandidatesImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-
-
-        $candidateRoleName = $row['candidate_role'];
+        $candidateRoleName = isset($row['candidate_role'])? $row['candidate_role'] : NULL;
         $candidateRole = CandidateRoles::where('candidate_role', $candidateRoleName)->first();
-        $excelDate = trim($row['date']);
+        $excelDate = isset($row['date'])? trim($row['date']) : NULL;
+        $dateIsValid = $this->parseDate($excelDate);
 
-        if (is_numeric($excelDate)) {
-            $excelDate = (int)$excelDate;
-            $dateIsValid = Carbon::createFromDate(1900, 1, 1)->addDays($excelDate - 2)->format('Y-m-d');
-        } else {
-            $dateIsValid = $excelDate;
-        }
+        // if (is_numeric($excelDate)) {
+        //     $excelDate = (int)$excelDate;
+        //     $dateIsValid = Carbon::createFromDate(1900, 1, 1)->addDays($excelDate - 2)->format('Y-m-d');
+        // } else {
+        //     $parsedDate = Carbon::parse($excelDate);
+        //     $dateIsValid =$parsedDate->format('Y-m-d');
+        // }
 
+        $resume = isset($row['resume'])?$row['resume']:NULL;
         $candidateData = [
-            'candidate_role_id' => $candidateRole ? $candidateRole->id : Null,
+            'candidate_role_id' => $candidateRole ? $candidateRole->id : NULL,
             'candidate_name' => $row['candidate_name'],
-            'email' => $row['email'],
+            'email' => isset($row['email']) ? $row['email'] : NULL,
             'date' => (string)$dateIsValid,
-            'source' => $row['source'] ? $row['source'] : NULL,
-            'experience' => $row['experience'],
-            'contact' => (string)$row['contact'],
-            'contact_by' => $row['contact_by'],
-            'status' => $row['status'],
-            'salary' => $row['salary'] ? $row['salary'] : NULL,
-            'expectation' => $row['expectation'] ? $row['expectation'] : NULL,
-            'upload_resume' => $row['resume'] ? 'resumes/' . $row['resume'] : NULL,
+            'source' => isset($row['source']) ? $row['source'] : NULL,
+            'experience' => isset($row['experience']) ? $row['experience'] : NULL,
+            'contact' =>  isset($row['contact']) ? (string)$row['contact'] : NULL,
+            'contact_by' => isset($row['contact_by'] ) ? $row['contact_by']  : NULL,
+            'status' => isset($row['status']) ? $row['status'] : NULL,
+            'salary' => isset($row['salary']) ? $row['salary'] : NULL,
+            'expectation' => isset($row['expectation'] )? $row['expectation'] : NULL,
+            'upload_resume' => !empty($resume) ? 'resumes/' . $resume : NULL,
         ];
 
         $existingCandidateByEmail = Candidate::where('email', $row['email'])->first();
@@ -76,4 +77,22 @@ class CandidatesImport implements ToModel, WithHeadingRow
     {
         return $this->updatedCandidatesCount;
     }
+
+
+    private function parseDate($excelDate)
+    {
+        if (is_numeric($excelDate)) {
+            $excelDate = (int)$excelDate;
+            $dateIsValid = Carbon::createFromDate(1900, 1, 1)->addDays($excelDate - 2)->format('Y-m-d');
+        } else {
+            // Try different date format parsing here
+            $parsedDate = Carbon::createFromFormat('d-m-y', $excelDate);
+            if (!$parsedDate->isValid()) {
+                $parsedDate = Carbon::parse($excelDate);
+            }
+            $dateIsValid = $parsedDate->format('Y-m-d');
+        }
+        return $dateIsValid;
+    }
+
 }

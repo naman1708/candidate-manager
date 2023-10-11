@@ -73,13 +73,7 @@ class CandidateController extends Controller
     {
         $request->validate([
             'candidate_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:candidates,email'],
-            // 'candidate_role_id' => ['required'],
-            // 'date' => ['required'],
-            // 'experience' => ['required'],
             'contact' => ['required', 'unique:candidates,contact'],
-            // 'status' => ['required'],
-            // 'contact_by' => ['required'],
         ]);
 
         DB::beginTransaction();
@@ -92,7 +86,6 @@ class CandidateController extends Controller
                 $resumePath = $uploadedFile->storeAs('resumes', $randomFileName, 'local');
                 $data['upload_resume'] = $resumePath;
             }
-
             Candidate::create($data);
         } catch (\Exception $e) {
             DB::rollback();
@@ -131,18 +124,9 @@ class CandidateController extends Controller
 
         $request->validate([
             'candidate_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255'],
-            // 'candidate_role_id' => ['required'],
-            // 'date' => ['required'],
-            // 'source' => ['required'],
-            // 'experience' => ['required'],
             'contact' => [
                 'required', Rule::unique('candidates', 'contact')->ignore($request->id),
             ],
-            // 'contact_by' => ['required'],
-            // 'status' => ['required'],
-            // 'salary' => ['required'],
-            // 'expectation' => ['required']
         ]);
 
         DB::beginTransaction();
@@ -264,43 +248,14 @@ class CandidateController extends Controller
         return Excel::download(new CandidatesExport, 'Candidates.csv');
     }
 
-
-    // public function export(Request $request)
-    // {
-    //     $selectedCandidates = $request->input('selectedCandidates', []);
-    //     $candidates = Candidate::with('candidateRole')
-    //         ->whereIn('id', $selectedCandidates)
-    //         ->get();
-
-    //     $data = $candidates->map(function ($candidate) {
-    //         return [
-    //             'Candidate Name' => $candidate->candidate_name,
-    //             'Contact' => $candidate->contact,
-    //             'Email' => $candidate->email,
-    //             'Contact By' => $candidate->contact_by,
-    //             'Candidate Role' => $candidate->candidateRole->candidate_role ?? 'N/A',
-    //             'Date' => $candidate->date,
-    //             'Source' => $candidate->source,
-    //             'Experience' => $candidate->experience,
-    //             'Salary' => $candidate->salary,
-    //             'Expectation' => $candidate->expectation,
-    //             'Status' => $candidate->status,
-    //             'Resume' => $candidate->upload_resume,
-    //         ];
-    //     });
-
-    //     return Excel::download(new CandidatesExport, 'SelectedCandidates.csv');
-    // }
-
-
+    /**
+     * Selected Candidate Data Export .
+     */
     public function selectedCandidateExport(Request $request)
     {
-        dd($request->all());
-        $selectedCandidates = explode(',', $request->input('selectedCandidates'));
-        $candidates = Candidate::with('candidateRole')
-            ->whereIn('id', $selectedCandidates)->get();
 
-        return Excel::download(new CandidatesExport, 'SelectedCandidates.csv');
+        $selectedCandidates = explode(',', $request->input('selectedCandidates'));
+        return Excel::download(new CandidatesExport($selectedCandidates), 'Candidates.csv');
     }
 
 
@@ -322,29 +277,16 @@ class CandidateController extends Controller
         return redirect()->back()->with('status', 'Sample CSV file Not Found.');
     }
 
-
-    public function uploadResumeView()
-    {
-        return view('candidates.uploadResume');
-    }
-
-
     public function uploadResume(Request $request)
     {
         $request->validate([
-            'file' => 'required',
+            'file' => 'required|mimes:pdf,doc,jpg,jpeg,png,docx',
         ]);
-        // dd($request->all());
-        // foreach ($request->file('file') as $file) {
-        //     $randomFileName = uniqid() . '.' . $file->getClientOriginalExtension();
-        //     $resumePath = $file->storeAs('resumes', $randomFileName, 'local');
-        // }
 
-        foreach ($request->file('file') as $file) {
-            $resumePath = $file->store('resumes', 'local');
-        }
+        $file = $request->file('file');
+        $fileName = $file->getClientOriginalName();;
+        $file->storeAs('resumes', $fileName, 'local');
 
-        // return response()->json(['message' => 'Files uploaded successfully']);
         return redirect()->back()->with('status', "Resume uploaded successfully");
     }
 }

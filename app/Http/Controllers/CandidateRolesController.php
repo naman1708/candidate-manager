@@ -114,7 +114,7 @@ class CandidateRolesController extends Controller
             DB::rollBack();
             return redirect()->back()->with('status', 'Candidate cannot be deleted!');
         }
-        
+
         DB::commit();
         return redirect()->back()->with('status', 'Candidate Role deleted successfully!');
     }

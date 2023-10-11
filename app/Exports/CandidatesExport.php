@@ -23,9 +23,17 @@ class CandidatesExport implements FromCollection, WithHeadings, WithStrictNullCo
 {
     use Exportable;
 
+    private $candidates;
+
+    public function __construct($candidates)
+    {
+        $this->candidates = $candidates;
+    }
+
     public function collection()
     {
-        $candidates = Candidate::with('candidateRole')->get();
+        // $this->candidates;
+        $candidates = Candidate::with('candidateRole')->whereIn('id', $this->candidates)->get();
 
         $data = $candidates->map(function ($candidate) {
             return [

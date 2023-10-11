@@ -52,8 +52,7 @@
                         <li><a href="{{route('candidates')}}">View All</a></li>
                         <li><a href="{{route('candidate.add')}}">Add New</a></li>
                         <li><a href="{{route('candidate.importFileView')}}">Bulk Upload</a></li>
-                        <li><a href="{{route('candidate.uploadResumeView')}}">Upload Resume</a></li>
-                        <li><a href="{{ route('candidate.export') }}">File Export</a></li>
+                        {{-- <li><a href="{{ route('candidate.export') }}">File Export</a></li> --}}
                     </ul>
                 </li>
 

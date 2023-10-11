@@ -2,6 +2,7 @@
 /node_modules
 /public/build
 /public/hot
+/storage/app/resumes
 /vendor
 .env
 .env.backup

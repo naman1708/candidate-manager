@@ -28,7 +28,7 @@
                     <hr>
                     <h5 class="card-title">
                         <span>Role : </span>
-                        <span>{{ $candidate->candidateRole->candidate_role }}</span>
+                        <span>{{ $candidate->candidateRole->candidate_role ?? NULL }}</span>
                     </h5>
                     <hr />
                     <h5 class="card-title">

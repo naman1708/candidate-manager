@@ -29,7 +29,7 @@
 
                     <div class="row">
                         <div class="col-lg-12">
-                            <x-form.select name="role_status" label="Status" :options="[
+                            <x-form.select name="role_status" label="Status" chooseFileComment="--Select status--" :options="[
                               'active' => 'Active',
                                 'inactive' => 'Inactive',
                             ]"/>

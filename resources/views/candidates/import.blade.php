@@ -43,12 +43,44 @@
                 </div>
             </div>
         </div>
+
+
+        <div class="col-lg-12">
+            <div id="successMessageResume" style="display: none;" class="alert alert-success mt-3">
+                Resume upload successful!
+            </div>
+            <div id="errorMessageResume" style="display: none;" class="alert alert-danger mt-3">
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('candidate.uploadResume') }}" method="POST" enctype="multipart/form-data"
+                        class="dropzone" id="resume-upload">
+                        @csrf
+                        <div class="dz-message needsclick">
+                            <div class="mb-3">
+                                <i class="display-4 text-muted ri-upload-cloud-2-line"></i>
+                            </div>
+                            <h4>Drop Resume files here or click to upload Candidate Resume file.</h4>
+                        </div>
+
+                    </form>
+                    <div class="text-center mt-4">
+                        <button type="submit" id="uploadResume" class="btn btn-primary waves-effect waves-light">Upload Resume</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 @endsection
 
 @push('script')
     <script type="text/javascript">
         Dropzone.autoDiscover = false;
+
+        // CSV Upload
         var myDropzone = new Dropzone("#file-upload", {
             url: "{{ route('candidate.import') }}",
             autoProcessQueue: false,
@@ -107,6 +139,68 @@
             console.log(errorMessage);
             showErrorMessage(errorMessage);
         });
+        // CSV Upload End
+
+        // Resume Upload
+        var resumeUpload = new Dropzone("#resume-upload", {
+            url: "{{ route('candidate.uploadResume') }}",
+            autoProcessQueue: false,
+            acceptedFiles: ".pdf,.doc,.jpg,.jpeg,.png,.docx",
+            maxFilesize: 10000,
+            parallelUploads: 999999,
+            init: function() {
+                this.on("addedfile", function(file) {
+                    addCancelButton(file);
+                });
+            },
+        });
+
+        function addCancelButton(file) {
+            var cancelButton = Dropzone.createElement(
+                "<button class='btn btn-danger btn-sm cancel-button text-center' style='margin-left: 30px;'>Remove</button>"
+            );
+
+            file.previewElement.appendChild(cancelButton);
+
+            cancelButton.addEventListener("click", function() {
+                resumeUpload.removeFile(file);
+            });
+        }
+
+        function showErrorMessage(message) {
+            $("#errorMessageResume").show();
+            $("#errorMessageResume").html(message);
+        }
+
+        $("#uploadResume").on("click", function() {
+            var files = resumeUpload.getQueuedFiles();
+
+            if (files.length === 0) {
+                showErrorMessage("Please choose a file.");
+            } else {
+                resumeUpload.options.autoProcessQueue = true;
+                resumeUpload.processQueue();
+            }
+        });
+
+        resumeUpload.on("queuecomplete", function() {
+            resumeUpload.options.autoProcessQueue = false;
+        });
+
+        resumeUpload.on("success", function(file, response) {
+            $("#successMessageResume").show();
+            $("#successMessageResume").html(response.message);
+            setTimeout(() => {
+                resumeUpload.removeFile(file);
+            }, 2000);
+            console.log(response.message);
+        });
+
+        resumeUpload.on("error", function(file, errorMessage) {
+            console.log(errorMessage);
+            showErrorMessage(errorMessage);
+        });
+        // Resume Upload End
     </script>
 
 @endpush

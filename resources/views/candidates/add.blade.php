@@ -28,8 +28,6 @@
                                 <x-form.input name="contact" label="Contact Number" />
                             </div>
                         </div>
-
-
                         <div class="row">
                             <div class="col-lg-6">
                                 <x-form.input name="email" label="Email Address" />

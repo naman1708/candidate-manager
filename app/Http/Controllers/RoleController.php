@@ -49,7 +49,6 @@ class RoleController extends Controller
             'name' => 'required|unique:roles,name',
             'permission' => 'required',
         ]);
-        // dd($request->all());
         DB::beginTransaction();
         try {
             $role = Role::create(['name' => $request->input('name')]);
@@ -94,7 +93,6 @@ class RoleController extends Controller
     public function update(Request $request, $id): RedirectResponse
     {
         $this->validate($request, [
-            'name' => 'required',
             'permission' => 'required',
         ]);
 
@@ -102,10 +100,10 @@ class RoleController extends Controller
         try {
 
             $role = Role::find($id);
-            $role->name = $request->input('name');
-            $role->save();
 
             $role->syncPermissions($request->input('permission'));
+            $role->save();
+
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('status', $e->getMessage());

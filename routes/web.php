@@ -85,12 +85,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('download-sampleCsv-candidate', [CandidateController::class, 'downloadSampleCsv'])->name('candidate.downloadSampleCsv');
 
-
-    Route::get('upload-resumes/', [CandidateController::class, 'uploadResumeView'])->name('candidate.uploadResumeView');
     Route::post('upload-candidate-resumes/', [CandidateController::class, 'uploadResume'])->name('candidate.uploadResume');
-
-
-
 
 
 
