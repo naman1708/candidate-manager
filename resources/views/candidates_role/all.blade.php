@@ -57,11 +57,13 @@
                                                     class="btn btn-info waves-effect waves-light edit">
                                                     <i class="ri-pencil-line"></i>
                                                 </a>
+                                                @role('admin')
                                                 <a href="{{ route('candidatesRole.delete', ['candidatesRole' => $role->id]) }}"
                                                     class="btn btn-danger waves-effect waves-light del"
                                                     onclick="return confirm('Are you sure delete this record!')">
                                                     <i class="ri-delete-bin-line"></i>
                                                 </a>
+                                                @endrole
                                             </div>
                                         </td>
                                     </tr>

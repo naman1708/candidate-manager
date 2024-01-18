@@ -62,21 +62,24 @@
 
 
                 <div class="card-body">
+
+                    @role('admin')
                     <form action="{{ route('candidate.selectedCandidateExport') }}" method="post" id="exportForm">
                         @csrf
                         <input type="hidden" name="selectedCandidates" id="selected-candidates" value="">
                         <button type="button" id="export-selected-button" class="btn btn-info btn-sm">Export Selected
                             Candidates</button>
                     </form>
+                    @endrole
 
                     <div class="table-responsive">
                         <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
-                                    <th><input class="form-check-input master-checkbox" type="checkbox" value=""
+                                    @role('admin')<th><input class="form-check-input master-checkbox" type="checkbox" value=""
                                             id="" name=""></th>
-                                    <th>{{ 'Candidate Name' }}</th>
+                                    <th>{{ 'Candidate Name' }}</th> @endrole
                                     <th>{{ 'Email' }}</th>
                                     <th>{{ 'Phone' }}</th>
                                     <th>{{ 'Role' }}</th>
@@ -90,9 +93,9 @@
                             <tbody id="candidatesData">
                                 @foreach ($candidates as $info)
                                     <tr>
-                                        <td> <input type="checkbox"
+                                        @role('admin')  <td> <input type="checkbox"
                                                 class="candidate-checkbox form-check-input child-checkbox"
-                                                data-candidate-id="{{ $info->id }}"></td>
+                                                data-candidate-id="{{ $info->id }}"></td> @endrole
                                         <td>{{ $info->candidate_name }}</td>
                                         <td>{{ $info->email }}</td>
                                         <td>{{ $info->contact }}</td>
