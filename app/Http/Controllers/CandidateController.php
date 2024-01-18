@@ -8,6 +8,7 @@ use App\Models\Candidate;
 use App\Models\CandidateRoles;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -30,31 +31,53 @@ class CandidateController extends Controller
      * Display a listing of the resource.
      */
 
+
     public function index(Request $request)
     {
-        $candidateRole = CandidateRoles::pluck('candidate_role', 'id')->toArray();
+        $candidateRole = CandidateRoles::get();
         $query = Candidate::with('candidateRole');
-
         $search = $request->input('search');
         $role = $request->input('candidate_role');
+        $from_date = $request->input('from_date');
+        $to_date = $request->input('to_date');
+
+        // Apply date range filter
+        if (!empty($from_date) && !empty($to_date)) {
+            $from_date = $this->validateAndParseDate($from_date);
+            $to_date = $this->validateAndParseDate($to_date);
+
+            if ($from_date && $to_date) {
+                $query->whereBetween('date', [$from_date->startOfDay(), $to_date->endOfDay()]);
+            }
+        }
+
         if (!empty($search)) {
             $query->where(function ($query) use ($search) {
                 $query->where('candidate_name', 'LIKE', "%$search%")
                     ->orWhere('email', 'LIKE', "%$search%")
                     ->orWhere('contact', 'LIKE', "%$search%")
-                    ->orWhere('experience', 'LIKE', "%$search%");
+                    ->orWhere('experience', 'LIKE', "%$search");
             });
         }
+
         if (!empty($role)) {
-            $selectedRole = $role; // the selected role
             $query->where('candidate_role_id', $role);
-        } else {
-            $selectedRole = null; // No role selected
         }
+
         $candidates = $query->paginate(10);
 
-        return view('candidates.all', compact('candidates', 'candidateRole', 'selectedRole'));
+        return view('candidates.all', compact('candidates', 'candidateRole', 'role'));
     }
+
+    private function validateAndParseDate($date)
+    {
+        try {
+            return Carbon::parse($date);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -152,6 +175,8 @@ class CandidateController extends Controller
             } elseif (empty($data['upload_resume'])) {
                 $data['upload_resume'] = $candidates->upload_resume;
             }
+
+
             $candidates->update($data);
         } catch (\Exception $e) {
             DB::rollback();
@@ -215,9 +240,9 @@ class CandidateController extends Controller
 
     public function import(Request $request)
     {
-        $this->validate($request, [
-            'file' => 'required|mimes:csv,xlsx,xls',
-        ]);
+        // $this->validate($request, [
+        //     'file' => 'required|mimes:csv,xlsx,xls',
+        // ]);
 
         DB::beginTransaction();
         try {

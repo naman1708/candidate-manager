@@ -33,6 +33,10 @@
                             </div>
                             <h4>Drop Csv files here or click to upload Candidate Csv file.</h4>
                         </div>
+                        @error('file')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+
 
                     </form>
                     <div class="text-center mt-4">
@@ -63,6 +67,10 @@
                             </div>
                             <h4>Drop Resume files here or click to upload Candidate Resume file.</h4>
                         </div>
+                        @error('file')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+
 
                     </form>
                     <div class="text-center mt-4">
@@ -132,12 +140,13 @@
             setTimeout(() => {
                 myDropzone.removeFile(file);
             }, 2000);
-            console.log(response.message);
+            console.log("import file response",response.message);
         });
 
         myDropzone.on("error", function(file, errorMessage) {
-            console.log(errorMessage);
-            showErrorMessage(errorMessage);
+            console.log("import error",errorMessage);
+            // showErrorMessage(errorMessage.message);
+            showErrorMessage(errorMessage.message);
         });
         // CSV Upload End
 
@@ -167,7 +176,7 @@
             });
         }
 
-        function showErrorMessage(message) {
+        function showResumeErrorMessage(message) {
             $("#errorMessageResume").show();
             $("#errorMessageResume").html(message);
         }
@@ -176,7 +185,7 @@
             var files = resumeUpload.getQueuedFiles();
 
             if (files.length === 0) {
-                showErrorMessage("Please choose a file.");
+                showResumeErrorMessage("Please choose a file.");
             } else {
                 resumeUpload.options.autoProcessQueue = true;
                 resumeUpload.processQueue();
@@ -198,7 +207,7 @@
 
         resumeUpload.on("error", function(file, errorMessage) {
             console.log(errorMessage);
-            showErrorMessage(errorMessage);
+            showResumeErrorMessage(errorMessage);
         });
         // Resume Upload End
     </script>

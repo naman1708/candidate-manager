@@ -17,18 +17,49 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="row container mt-4 mb-4" style="display:flex; justify-content: space-between;">
 
-                    <div class="col-lg-5 mx-1">
-                        <x-form.select label="Role Filter" chooseFileComment="All" name="candidate_role_id" :options="$candidateRole"
-                            :selected="$selectedRole" />
+                {{-- Date Filter --}}
+                <form action="{{ route('candidates') }}" method="get">
+                    <div class="row m-2">
+                        <div class="col-lg-2">
+                            <label for="candidate_role">{{ 'Role Filter' }}</label>
+                            <select name="candidate_role" id="candidate_role" class="form-control">
+                                <option value="">All</option>
+                                @foreach ($candidateRole as $role)
+                                    <option value="{{ $role->id }} "
+                                        {{ isset($_REQUEST['candidate_role']) && $_REQUEST['candidate_role'] == $role->id ? 'selected' : '' }}>
+
+                                        {{ $role->candidate_role }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2">
+                            <label for="from_date">{{ 'Date From' }}</label>
+                            <input type="date" name="from_date" id="from_date" class="form-control"
+                            value="{{ isset($_REQUEST['from_date']) ? $_REQUEST['from_date'] : '' }}" />
+                        </div>
+
+                        <div class="col-lg-2">
+                            <label for="to_date">{{ 'Date To' }}</label>
+                            <input type="date" name="to_date" id="to_date" class="form-control"
+                            value="{{ isset($_REQUEST['to_date']) ? $_REQUEST['to_date'] : '' }}"  />
+                        </div>
+
+                        <div class="col-4">
+                            <label for="search">{{ 'Search' }}</label>
+                            <input type="text" name="search" id="search" class="form-control"
+                                placeholder="Search....." value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" />
+                        </div>
+
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-primary mt-lg-4">{{ 'Filter' }}</button>
+                            <button type="reset" class="btn btn-secondary mt-lg-4">{{ 'Reset' }}</button>
+                        </div>
                     </div>
-                    <div class="col-lg-4 mt-1 mr-3">
-                        <x-search.table-search action="{{ route('candidates') }}" method="get" name="search"
-                            value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" btnClass="search_btn"
-                            catVal="{{ request('candidate_role') }}" roleName="candidate_role" />
-                    </div>
-                </div>
+                </form>
+
 
                 <div class="card-body">
                     <form action="{{ route('candidate.selectedCandidateExport') }}" method="post" id="exportForm">
@@ -38,71 +69,80 @@
                             Candidates</button>
                     </form>
 
-                    <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                        <thead>
-                            <tr>
-                                <th><input class="form-check-input master-checkbox" type="checkbox" value=""
-                                        id="" name=""></th>
-                                <th>{{ 'Candidate Name' }}</th>
-                                <th>{{ 'Email' }}</th>
-                                <th>{{ 'Phone' }}</th>
-                                <th>{{ 'Role' }}</th>
-                                <th>{{ 'Experience' }}</th>
-                                <th>{{ 'Actions' }}</th>
-                                <th>{{ 'Download Resume' }}</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="candidatesData">
-                            @foreach ($candidates as $info)
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead>
                                 <tr>
-                                    <td> <input type="checkbox" class="candidate-checkbox form-check-input child-checkbox"
-                                            data-candidate-id="{{ $info->id }}"></td>
-                                    <td>{{ $info->candidate_name }}</td>
-                                    <td>{{ $info->email }}</td>
-                                    <td>{{ $info->contact }}</td>
-                                    <td>{{ $info->candidateRole->candidate_role ?? 'Null' }}</td>
-                                    <td>{{ $info->experience }}</td>
-                                    <td>
-                                        <div class="action-btns text-center" role="group">
-                                            <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
-                                                class="btn btn-primary waves-effect waves-light view">
-                                                <i class="ri-eye-line"></i>
-                                            </a>
-                                            @can('candidate-edit')
-                                                <a href="{{ route('candidate.edit', [$info->id]) }}"
-                                                    class="btn btn-info waves-effect waves-light edit">
-                                                    <i class="ri-pencil-line"></i>
-                                                </a>
-                                            @endcan
-                                            @can('candidate-delete')
-                                                <a href="{{ route('candidate.delete', [$info->id]) }}"
-                                                    class="btn btn-danger waves-effect waves-light del"
-                                                    onclick="return confirm('Are you sure delete this record!')">
-                                                    <i class="ri-delete-bin-line"></i>
-                                                </a>
-                                            @endcan
-                                        </div>
-                                    </td>
-                                    @if (!empty($info->upload_resume))
-                                        @php
-                                            $resumePath = $info->upload_resume;
-                                        @endphp
-                                        @if (Storage::disk('local')->exists($resumePath))
-                                            <td class="text-center">
-                                                <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    <i class="ri-download-cloud-fill"></i>
-                                                </a>
-                                            </td>
-                                        @endif
-                                    @endif
+                                    <th><input class="form-check-input master-checkbox" type="checkbox" value=""
+                                            id="" name=""></th>
+                                    <th>{{ 'Candidate Name' }}</th>
+                                    <th>{{ 'Email' }}</th>
+                                    <th>{{ 'Phone' }}</th>
+                                    <th>{{ 'Role' }}</th>
+                                    <th>{{ 'Experience' }}</th>
+                                    <th>{{ 'Date' }}</th>
+                                    <th>{{ 'Actions' }}</th>
+                                    <th>{{ 'Download Resume' }}</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    {{ $candidates->onEachSide(3)->links() }}
+                            </thead>
+
+                            <tbody id="candidatesData">
+                                @foreach ($candidates as $info)
+                                    <tr>
+                                        <td> <input type="checkbox"
+                                                class="candidate-checkbox form-check-input child-checkbox"
+                                                data-candidate-id="{{ $info->id }}"></td>
+                                        <td>{{ $info->candidate_name }}</td>
+                                        <td>{{ $info->email }}</td>
+                                        <td>{{ $info->contact }}</td>
+                                        <td>{{ $info->candidateRole->candidate_role ?? 'Null' }}</td>
+                                        <td>{{ $info->experience }}</td>
+                                        <td>
+                                            {{ \Carbon\Carbon::parse($info->date)->format('d-M-Y') }}
+                                        </td>
+                                        <td>
+                                            <div class="action-btns text-center" role="group">
+                                                <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
+                                                    class="btn btn-primary waves-effect waves-light view">
+                                                    <i class="ri-eye-line"></i>
+                                                </a>
+                                                @can('candidate-edit')
+                                                    <a href="{{ route('candidate.edit', [$info->id]) }}"
+                                                        class="btn btn-info waves-effect waves-light edit">
+                                                        <i class="ri-pencil-line"></i>
+                                                    </a>
+                                                @endcan
+                                                @can('candidate-delete')
+                                                    <a href="{{ route('candidate.delete', [$info->id]) }}"
+                                                        class="btn btn-danger waves-effect waves-light del"
+                                                        onclick="return confirm('Are you sure delete this record!')">
+                                                        <i class="ri-delete-bin-line"></i>
+                                                    </a>
+                                                @endcan
+                                            </div>
+                                        </td>
+                                        @if (!empty($info->upload_resume))
+                                            @php
+                                                $resumePath = $info->upload_resume;
+                                            @endphp
+                                            @if (Storage::disk('local')->exists($resumePath))
+                                                <td class="text-center">
+                                                    <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
+                                                        class="btn btn-primary btn-sm">
+                                                        <i class="ri-download-cloud-fill"></i>
+                                                    </a>
+                                                </td>
+                                            @endif
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{ $candidates->appends(request()->query())->links() }}
+
                 </div>
             </div>
         </div> <!-- end col -->
@@ -110,31 +150,6 @@
 @endsection
 
 @push('script')
-    {{-- <script>
-        $(document).ready(function() {
-            $('#candidate_role_id').on("change", function() {
-                let category = $(this).val()
-                let url = "{{ route('candidates') }}"
-                location.href = `${url}?candidate_role=${category}`
-
-            })
-        });
-    </script> --}}
-
-    <script>
-        $(document).ready(function() {
-            $('#candidate_role_id').on("change", function() {
-                let category = $(this).val();
-                let url = "{{ route('candidates') }}";
-                // Append the role filter to the existing search query parameters
-                let search = new URLSearchParams(window.location.search);
-                search.set('candidate_role', category);
-                // Redirect to the updated URL
-                window.location.href = `${url}?${search.toString()}`;
-            });
-        });
-    </script>
-
     {{-- File export script --}}
     <script>
         $(document).ready(function() {
@@ -154,9 +169,15 @@
                 $('.candidate-checkbox:checked').each(function() {
                     selectedCandidates.push($(this).data('candidate-id'));
                 });
-                $('#selected-candidates').val(selectedCandidates)
-                $('#exportForm').submit();
+
+                if (selectedCandidates.length === 0) {
+                    alert("Please select at least one candidate.");
+                } else {
+                    $('#selected-candidates').val(selectedCandidates);
+                    $('#exportForm').submit();
+                }
             });
+
         });
     </script>
 @endpush

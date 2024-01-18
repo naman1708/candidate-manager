@@ -90,6 +90,8 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+
     public function update(Request $request, $id): RedirectResponse
     {
         $this->validate($request, [
@@ -97,20 +99,29 @@ class RoleController extends Controller
         ]);
 
         DB::beginTransaction();
-        try {
 
+        try {
             $role = Role::find($id);
 
-            $role->syncPermissions($request->input('permission'));
-            $role->save();
-
+            // Check if the role is not the admin role
+            if ($role->name !== 'admin') {
+                $role->syncPermissions($request->input('permission'));
+                $role->save();
+            } else {
+                // Admin role not be updated
+                throw new \Exception("You are not allowed to update permission the admin role.");
+            }
         } catch (Exception $e) {
             DB::rollback();
             return redirect()->back()->with('status', $e->getMessage());
         }
+
         DB::commit();
         return redirect()->back()->with('status', 'Role updated successfully');
     }
+
+
+
     /**
      * Remove the specified resource from storage.
      */
