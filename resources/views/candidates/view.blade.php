@@ -11,7 +11,7 @@
 @endpush
 
 @section('content')
-
+    <x-status-message />
     {{-- Candidates details --}}
     <div class="row">
         <div class="col-lg-6">
@@ -28,7 +28,7 @@
                     <hr>
                     <h5 class="card-title">
                         <span>Role : </span>
-                        <span>{{ $candidate->candidateRole->candidate_role ?? NULL }}</span>
+                        <span>{{ $candidate->candidateRole->candidate_role ?? null }}</span>
                     </h5>
                     <hr />
                     <h5 class="card-title">
@@ -110,10 +110,102 @@
                     </h5>
                     <hr>
 
+                    <h5 class="card-title">
+                        <span>Schedule interview :</span>
+                        <span>
+                            <a href="javascript:void(0)" class="btn btn-info btn-sm"
+                                onclick="scheduleCandidateInterview(<?= $candidate->id ?>)">Schedule</a>
+                        </span>
+                    </h5>
+                    <hr>
+
                 </div>
             </div>
         </div>
 
     </div>
 
+
+    {{-- Schedule Interview Form --}}
+
+    <div class="modal fade" id="scheduleInterviewModel" tabindex="-1" aria-labelledby="scheduleInterviewModelLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title fs-5 text-dark" id="scheduleInterviewLabel">{{ 'Schedule Interview' }}</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('candidate.scheduleInterview') }}" method="post">
+                    @csrf
+                    <input type="hidden" name="candidate_id" value="<?= $candidate->id ?>">
+                    <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <label for="">Interview Date</label>
+                                <input type="date" name="interview_date" class="form-control"
+                                    value="{{ old('interview_date', $candidate->scheduleInterview ? $candidate->scheduleInterview->interview_date : '') }}"  required>
+
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label for="">Interview Time</label>
+                                <input type="time" name="interview_time" class="form-control"
+                                    value="{{ old('interview_time', $candidate->scheduleInterview ? $candidate->scheduleInterview->interview_time : '') }}" required>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <label for="">Status</label>
+                                <select name="interview_status" id="interview_status" class="form-control" required>
+                                    <option value="">--Select Status--</option>
+                                    <option value="selected"
+                                        {{ $candidate->scheduleInterview ? ($candidate->scheduleInterview->interview_status == 'selected' ? 'selected' : '') : '' }}>
+                                        Selected</option>
+
+                                    <option value="pending"
+                                        {{ $candidate->scheduleInterview ? ($candidate->scheduleInterview->interview_status == 'pending' ? 'selected' : '') : '' }}>
+                                        Pending</option>
+
+                                    <option value="rejected"
+                                        {{ $candidate->scheduleInterview ? ($candidate->scheduleInterview->interview_status == 'rejected' ? 'selected' : '') : '' }}>
+                                        Rejected</option>
+                                </select>
+                            </div>
+
+                            <div class="col-lg-12" id="reasonContainer">
+                                <label for="message-text" class="col-form-label">Message:</label>
+                                <textarea class="form-control" name="reason" id="reason" required>{{ old('reason', $candidate->scheduleInterview ? $candidate->scheduleInterview->reason : '') }}</textarea>
+                            </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
 @endsection
+
+@push('script')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).on("change","#interview_status",function(){
+            let option = $(this).val();
+            if(option == "pending"){
+                $('#reason').html(`Coming on later date.`)
+            }else{
+                $('#reason').html(``)
+            }
+        })
+        function scheduleCandidateInterview() {
+            $('#scheduleInterviewModel').modal('show');
+        }
+    </script>
+
+@endpush

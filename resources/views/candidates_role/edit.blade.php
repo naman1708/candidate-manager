@@ -38,7 +38,7 @@
                     </div>
 
                     <div>
-                        <button class="btn btn-primary mt-2" type="submit">{{__('update Candidate Role')}}</button>
+                        <button class="btn btn-primary mt-2" type="submit">{{__('Update Candidate Role')}}</button>
                     </div>
                 </form>
            </div>

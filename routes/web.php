@@ -10,6 +10,7 @@ use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ScheduleInterviewController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Models\Investor;
@@ -38,7 +39,7 @@ Route::get('/', function () {
 // });
 
 
-Route::group(['middleware' => ['auth','role:admin']], function () {
+Route::group(['middleware' => ['auth', 'role:admin']], function () {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
 });
@@ -101,6 +102,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/delete-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'destroy'])->name('candidatesRole.delete');
 
+
+
+    // Schedule Interview Controller Route
+
+    Route::post('candidate-schedule-interview',[ScheduleInterviewController::class,'scheduleInterview'])->name('candidate.scheduleInterview');
 
 });
 

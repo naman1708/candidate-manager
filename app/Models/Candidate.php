@@ -16,4 +16,9 @@ class Candidate extends Model
     {
         return $this->belongsTo(CandidateRoles::class, 'candidate_role_id','id');
     }
+
+    public function scheduleInterview()
+    {
+        return $this->hasOne(ScheduleInterview::class, 'candidate_id', 'id');
+    }
 }

@@ -124,6 +124,8 @@ class CandidateController extends Controller
      */
     public function show(Candidate $candidate)
     {
+        // $candidate->load('scheduleInterview');
+        $candidate->with('scheduleInterview');
         return view('candidates.view')->with(compact('candidate'));
     }
 

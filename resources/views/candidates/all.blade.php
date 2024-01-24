@@ -38,19 +38,20 @@
                         <div class="col-lg-2">
                             <label for="from_date">{{ 'Date From' }}</label>
                             <input type="date" name="from_date" id="from_date" class="form-control"
-                            value="{{ isset($_REQUEST['from_date']) ? $_REQUEST['from_date'] : '' }}" />
+                                value="{{ isset($_REQUEST['from_date']) ? $_REQUEST['from_date'] : '' }}" />
                         </div>
 
                         <div class="col-lg-2">
                             <label for="to_date">{{ 'Date To' }}</label>
                             <input type="date" name="to_date" id="to_date" class="form-control"
-                            value="{{ isset($_REQUEST['to_date']) ? $_REQUEST['to_date'] : '' }}"  />
+                                value="{{ isset($_REQUEST['to_date']) ? $_REQUEST['to_date'] : '' }}" />
                         </div>
 
                         <div class="col-4">
                             <label for="search">{{ 'Search' }}</label>
                             <input type="text" name="search" id="search" class="form-control"
-                                placeholder="Search....." value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" />
+                                placeholder="Search....."
+                                value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" />
                         </div>
 
                         <div class="col-2">
@@ -64,12 +65,12 @@
                 <div class="card-body">
 
                     @role('admin')
-                    <form action="{{ route('candidate.selectedCandidateExport') }}" method="post" id="exportForm">
-                        @csrf
-                        <input type="hidden" name="selectedCandidates" id="selected-candidates" value="">
-                        <button type="button" id="export-selected-button" class="btn btn-info btn-sm">Export Selected
-                            Candidates</button>
-                    </form>
+                        <form action="{{ route('candidate.selectedCandidateExport') }}" method="post" id="exportForm">
+                            @csrf
+                            <input type="hidden" name="selectedCandidates" id="selected-candidates" value="">
+                            <button type="button" id="export-selected-button" class="btn btn-info btn-sm">Export Selected
+                                Candidates</button>
+                        </form>
                     @endrole
 
                     <div class="table-responsive">
@@ -77,9 +78,11 @@
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead>
                                 <tr>
-                                    @role('admin')<th><input class="form-check-input master-checkbox" type="checkbox" value=""
-                                            id="" name=""></th>
-                                    <th>{{ 'Candidate Name' }}</th> @endrole
+                                    @role('admin')
+                                        <th><input class="form-check-input master-checkbox" type="checkbox" value=""
+                                                id="" name=""></th>
+                                        <th>{{ 'Candidate Name' }}</th>
+                                    @endrole
                                     <th>{{ 'Email' }}</th>
                                     <th>{{ 'Phone' }}</th>
                                     <th>{{ 'Role' }}</th>
@@ -93,9 +96,11 @@
                             <tbody id="candidatesData">
                                 @foreach ($candidates as $info)
                                     <tr>
-                                        @role('admin')  <td> <input type="checkbox"
-                                                class="candidate-checkbox form-check-input child-checkbox"
-                                                data-candidate-id="{{ $info->id }}"></td> @endrole
+                                        @role('admin')
+                                            <td> <input type="checkbox"
+                                                    class="candidate-checkbox form-check-input child-checkbox"
+                                                    data-candidate-id="{{ $info->id }}"></td>
+                                        @endrole
                                         <td>{{ $info->candidate_name }}</td>
                                         <td>{{ $info->email }}</td>
                                         <td>{{ $info->contact }}</td>

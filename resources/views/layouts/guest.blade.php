@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Rich More Investment') }}</title>
+        <title>{{ config('app.name', 'Candidate Manager') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -23,7 +23,7 @@
             <div class="container-fluid p-0">
                 <div class="card">
                     <div class="card-body">
-    
+
                         <div class="text-center mt-4">
                             <div class="mb-3">
                             {{-- <h2 style="text-transform:uppercase;color:#555">RichMore Investment</h2> --}}
