@@ -6,9 +6,11 @@ use App\Exports\CandidatesExport;
 use App\Imports\CandidatesImport;
 use App\Models\Candidate;
 use App\Models\CandidateRoles;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -35,7 +37,7 @@ class CandidateController extends Controller
     public function index(Request $request)
     {
         $candidateRole = CandidateRoles::get();
-        $query = Candidate::with('candidateRole');
+        $query = Candidate::with('candidateRole', 'createby');
         $search = $request->input('search');
         $role = $request->input('candidate_role');
         $from_date = $request->input('from_date');
@@ -64,9 +66,29 @@ class CandidateController extends Controller
             $query->where('candidate_role_id', $role);
         }
 
-        $candidates = $query->paginate(10);
+        if (!empty($request->tag)) {
+            $query->where('interview_status_tag', $request->tag);
+        }
 
-        return view('candidates.all', compact('candidates', 'candidateRole', 'role'));
+        if (!empty($request->manager)) {
+            $query->where('user_id', $request->manager);
+        }
+
+
+        $managers = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['manager', 'admin']);
+        })->get();
+
+
+        // $managers = User::whereHas('roles', function ($query) {
+        //     $query->where('name', 'manager');
+        // })->whereDoesntHave('roles', function ($query) {
+        //     $query->where('name', 'admin');
+        // })->get();
+
+        $candidates = $query->orderBy('id', 'desc')->paginate(10);
+
+        return view('candidates.all', compact('candidates', 'candidateRole', 'role', 'managers'));
     }
 
     private function validateAndParseDate($date)
@@ -109,6 +131,7 @@ class CandidateController extends Controller
                 $resumePath = $uploadedFile->storeAs('resumes', $randomFileName, 'local');
                 $data['upload_resume'] = $resumePath;
             }
+            $data['user_id'] = Auth::id();
             Candidate::create($data);
         } catch (\Exception $e) {
             DB::rollback();
@@ -178,7 +201,7 @@ class CandidateController extends Controller
                 $data['upload_resume'] = $candidates->upload_resume;
             }
 
-
+            $data['superadmin_instruction'] = isset($request->superadmin_instruction) ? $request->superadmin_instruction : '';
             $candidates->update($data);
         } catch (\Exception $e) {
             DB::rollback();

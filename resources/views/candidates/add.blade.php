@@ -10,7 +10,7 @@
 
 @section('content')
     <x-status-message />
-
+    <a href="{{route('candidates')}}" class="btn btn-primary btn-sm">{{'Candidates'}}</a>
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -84,6 +84,21 @@
                             <div class="col-lg-6">
                                 <x-form.input name="upload_resume" label="Upload Resume" type="file" />
                             </div>
+
+                            <div class="col-lg-12">
+                                <x-form.select name="interview_status_tag" label="Tag"
+                                    chooseFileComment="--Select Tage--" :options="[
+                                        'interview scheduled' => 'Interview Scheduled',
+                                        'interviewed' => 'Interviewed',
+                                        'selected' => 'Selected',
+                                        'rejected' => 'Rejected',
+                                    ]" />
+                            </div>
+
+                            <div class="col-lg-12">
+                                <x-form.textarea name="comment" label="Comment" />
+                            </div>
+
                         </div>
 
                         <div>

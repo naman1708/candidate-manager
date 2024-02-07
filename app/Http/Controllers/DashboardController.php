@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Candidate;
 use App\Models\CandidateRoles;
 use App\Models\ScheduleInterview;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Current;
 
 class DashboardController extends Controller
 {
@@ -33,7 +35,7 @@ class DashboardController extends Controller
                 });
             })
             ->when(!empty($request->from_date) && !empty($request->to_date), function ($query) use ($request) {
-                
+
                 $from_date = Carbon::parse($request->from_date);
                 $to_date = Carbon::parse($request->to_date);
 
@@ -44,8 +46,21 @@ class DashboardController extends Controller
             ->orderByRaw('interview_date >= CURDATE() desc, interview_date')
             ->paginate(10);
 
-        return view('dashboard')->with(compact('total'));
+
+        // Today Uploaded Candidates List
+
+        $managers = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['manager', 'admin']);
+        })->get();
+        $candidateRole = CandidateRoles::get();
+
+        $currentUploadedCandidates = Candidate::with('candidateRole', 'createby')
+            ->whereDate('created_at', now()->format('Y-m-d'))
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+
+
+        return view('dashboard')->with(compact('total', 'currentUploadedCandidates', 'managers', 'candidateRole'));
     }
-
-
 }

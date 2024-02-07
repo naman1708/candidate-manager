@@ -10,7 +10,8 @@
 
 @section('content')
     <x-status-message />
-
+    <a href="{{route('candidates')}}" class="btn btn-primary btn-sm">{{'Candidate'}}</a>
+    <a href="{{ url()->previous() }}" class="btn btn-warning btn-sm">{{'Back'}}</a>
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -20,6 +21,14 @@
                         <input type="hidden" name="id" id="" value="{{ $candidates->id }}">
                         @csrf
                         <h4 class="card-title mb-3">{{ __('Personal Details') }}</h4>
+
+                        @role('admin')
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <x-form.textarea name="superadmin_instruction" label="Superadmin Instruction" value="{{ $candidates->superadmin_instruction }}" />
+                            </div>
+                        </div>
+                        @endrole
 
                         <div class="row">
                             <div class="col-lg-6">
@@ -98,8 +107,23 @@
                             </div>
                         </div>
 
+
+                        <div class="col-lg-12">
+                            <x-form.select name="interview_status_tag" label="Tag" chooseFileComment="--Select Tage--"
+                                :options="[
+                                    'interview scheduled' => 'Interview Scheduled',
+                                    'interviewed' => 'Interviewed',
+                                    'selected' => 'Selected',
+                                    'rejected' => 'Rejected',
+                                ]" :selected="$candidates->interview_status_tag" />
+                        </div>
+
+                        <div class="col-lg-12">
+                            <x-form.textarea name="comment" label="Comment" value="{{ $candidates->comment }}" />
+                        </div>
+
                         <div>
-                            <button class="btn btn-primary" type="submit">{{ __('update Candidate') }}</button>
+                            <button class="btn btn-primary" type="submit">{{ __('Update Candidate') }}</button>
                         </div>
                     </form>
                 </div>

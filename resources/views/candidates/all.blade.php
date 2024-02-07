@@ -20,8 +20,24 @@
 
                 {{-- Date Filter --}}
                 <form action="{{ route('candidates') }}" method="get">
-                    <div class="row m-2">
-                        <div class="col-lg-2">
+                    <div class="row m-3">
+
+                        @role('admin')
+                            <div class="col-lg-4">
+                                <label for="">{{ 'Managers Filter' }}</label>
+                                <select name="manager" id="manager" class="form-control">
+                                    <option value="">All</option>
+                                    @foreach ($managers as $mana)
+                                        <option value="{{ $mana->id }}"
+                                            {{ isset($_REQUEST['manager']) && $_REQUEST['manager'] == $mana->id ? 'selected' : '' }}>
+                                            {{ $mana->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endrole
+
+                        <div class="col-lg-4">
                             <label for="candidate_role">{{ 'Role Filter' }}</label>
                             <select name="candidate_role" id="candidate_role" class="form-control">
                                 <option value="">All</option>
@@ -35,19 +51,32 @@
                             </select>
                         </div>
 
-                        <div class="col-lg-2">
+                        <div class="col-lg-4">
+                            <x-form.select name="tag" label="Tag Filter" chooseFileComment="All" :options="[
+                                'interview scheduled' => 'Interview Scheduled',
+                                'interviewed' => 'Interviewed',
+                                'selected' => 'Selected',
+                                'rejected' => 'Rejected',
+                            ]"
+                                :selected="isset($_REQUEST['tag']) ? $_REQUEST['tag'] : ''" />
+                        </div>
+
+
+
+
+                        <div class="col-lg-3">
                             <label for="from_date">{{ 'Date From' }}</label>
                             <input type="date" name="from_date" id="from_date" class="form-control"
                                 value="{{ isset($_REQUEST['from_date']) ? $_REQUEST['from_date'] : '' }}" />
                         </div>
 
-                        <div class="col-lg-2">
+                        <div class="col-lg-3">
                             <label for="to_date">{{ 'Date To' }}</label>
                             <input type="date" name="to_date" id="to_date" class="form-control"
                                 value="{{ isset($_REQUEST['to_date']) ? $_REQUEST['to_date'] : '' }}" />
                         </div>
 
-                        <div class="col-4">
+                        <div class="col-3">
                             <label for="search">{{ 'Search' }}</label>
                             <input type="text" name="search" id="search" class="form-control"
                                 placeholder="Search....."
@@ -56,7 +85,7 @@
 
                         <div class="col-2">
                             <button type="submit" class="btn btn-primary mt-lg-4">{{ 'Filter' }}</button>
-                            <button type="reset" class="btn btn-secondary mt-lg-4">{{ 'Reset' }}</button>
+                            <a href="{{ route('candidates') }}" class="btn btn-secondary mt-lg-4">{{ 'Reset' }}</a>
                         </div>
                     </div>
                 </form>
@@ -81,13 +110,16 @@
                                     @role('admin')
                                         <th><input class="form-check-input master-checkbox" type="checkbox" value=""
                                                 id="" name=""></th>
-                                        <th>{{ 'Candidate Name' }}</th>
                                     @endrole
-                                    <th>{{ 'Email' }}</th>
+                                    <th>{{ 'Candidate Name' }}</th>
                                     <th>{{ 'Phone' }}</th>
                                     <th>{{ 'Role' }}</th>
+                                    <th>{{ 'Tag' }}</th>
                                     <th>{{ 'Experience' }}</th>
                                     <th>{{ 'Date' }}</th>
+                                    @role('admin')
+                                        <th>{{ 'Createby' }}</th>
+                                    @endrole
                                     <th>{{ 'Actions' }}</th>
                                     <th>{{ 'Download Resume' }}</th>
                                 </tr>
@@ -102,25 +134,26 @@
                                                     data-candidate-id="{{ $info->id }}"></td>
                                         @endrole
                                         <td>{{ $info->candidate_name }}</td>
-                                        <td>{{ $info->email }}</td>
                                         <td>{{ $info->contact }}</td>
                                         <td>{{ $info->candidateRole->candidate_role ?? 'Null' }}</td>
+                                        <td>{{ $info->interview_status_tag ?? 'No Status' }}</td>
                                         <td>{{ $info->experience }}</td>
                                         <td>
                                             {{ \Carbon\Carbon::parse($info->date)->format('d-M-Y') }}
                                         </td>
+
+                                        @role('admin')
+                                            <td> {{ isset($info->createby->name) ? Str::ucfirst($info->createby->name) : '' }}
+                                            </td>
+                                        @endrole
+
                                         <td>
                                             <div class="action-btns text-center" role="group">
                                                 <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
                                                     class="btn btn-primary waves-effect waves-light view">
                                                     <i class="ri-eye-line"></i>
                                                 </a>
-                                                @can('candidate-edit')
-                                                    <a href="{{ route('candidate.edit', [$info->id]) }}"
-                                                        class="btn btn-info waves-effect waves-light edit">
-                                                        <i class="ri-pencil-line"></i>
-                                                    </a>
-                                                @endcan
+
                                                 @can('candidate-delete')
                                                     <a href="{{ route('candidate.delete', [$info->id]) }}"
                                                         class="btn btn-danger waves-effect waves-light del"

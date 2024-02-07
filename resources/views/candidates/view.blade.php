@@ -13,9 +13,19 @@
 @section('content')
     <x-status-message />
     {{-- Candidates details --}}
+ <div class="m-4">
+    <a href="{{ route('candidates') }}" class="btn btn-primary">{{ 'Back' }}</a>
+    @can('candidate-edit')
+    <a href="{{ route('candidate.edit', [$candidate->id]) }}" class="btn btn-info waves-effect waves-light edit float-end">{{'Candidate Edit Profile'}}
+        <i class="ri-pencil-line"></i>
+    </a>
+@endcan
+ </div>
+
     <div class="row">
         <div class="col-lg-6">
             <div class="card">
+
                 <h5 class="card-header">{{ 'Candidates Details' }}</h5>
                 <div class="card-body">
 
@@ -58,13 +68,22 @@
                     </h5>
                     <hr>
 
+                    <h5 class="card-title">
+                        <span>Tag : </span>
+                        <span>{{ isset($candidate->interview_status_tag) ? Str::ucfirst($candidate->interview_status_tag) : 'No Tage' }}</span>
+                    </h5>
+                    <hr>
+
                 </div>
             </div>
         </div>
 
+
+
         <div class="col-lg-6">
             <div class="card">
                 <h5 class="card-header">Contact Details</h5>
+
                 <div class="card-body">
                     <h5 class="card-title">
                         <span>Phone : </span>
@@ -119,6 +138,21 @@
                     </h5>
                     <hr>
 
+
+                    <h5 class="card-title">
+                        <span>Comment : </span><br>
+                        <span
+                            class="mt-2">{{ isset($candidate->comment) ? Str::ucfirst($candidate->comment) : 'No Comment' }}</span>
+                    </h5>
+                    <hr>
+
+                    <h5 class="card-title">
+                        <span class="text-danger">{{ 'Superadmin Instruction : ' }}</span><br>
+                        <span
+                            class="mt-2">{{ isset($candidate->superadmin_instruction) ? Str::ucfirst($candidate->superadmin_instruction) : 'No instruction' }}</span>
+                    </h5>
+                    <hr>
+
                 </div>
             </div>
         </div>
@@ -145,14 +179,16 @@
                             <div class="col-lg-4">
                                 <label for="">Interview Date</label>
                                 <input type="date" name="interview_date" class="form-control"
-                                    value="{{ old('interview_date', $candidate->scheduleInterview ? $candidate->scheduleInterview->interview_date : '') }}"  required>
+                                    value="{{ old('interview_date', $candidate->scheduleInterview ? $candidate->scheduleInterview->interview_date : '') }}"
+                                    required>
 
                             </div>
 
                             <div class="col-lg-4">
                                 <label for="">Interview Time</label>
                                 <input type="time" name="interview_time" class="form-control"
-                                    value="{{ old('interview_time', $candidate->scheduleInterview ? $candidate->scheduleInterview->interview_time : '') }}" required>
+                                    value="{{ old('interview_time', $candidate->scheduleInterview ? $candidate->scheduleInterview->interview_time : '') }}"
+                                    required>
                             </div>
 
                             <div class="col-lg-4">
@@ -193,19 +229,19 @@
 @endsection
 
 @push('script')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).on("change","#interview_status",function(){
+        $(document).on("change", "#interview_status", function() {
             let option = $(this).val();
-            if(option == "pending"){
+            if (option == "pending") {
                 $('#reason').html(`Coming on later date.`)
-            }else{
+            } else {
                 $('#reason').html(``)
             }
         })
+
         function scheduleCandidateInterview() {
             $('#scheduleInterviewModel').modal('show');
         }
     </script>
-
 @endpush
