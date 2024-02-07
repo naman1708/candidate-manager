@@ -16,8 +16,12 @@
             desc="User" />
     </div>
 
+    {{-- <div class="m-4 mt-4">
+        <a href="{{route('currentDateUploadedCandidates')}}" class="btn btn-info waves-effect waves-light edit float-end">{{ 'Today Uploaded Candidate List' }} <i class="fa fa-eye"></i> </a>
+    </div> --}}
 
-    <h4 class="card-title mt-4 mb-4">{{ __(' Candidate Schedule Interview List ') }}</h4>
+    <h5 class="m-4"><b>{{ 'Candidate Schedule Interview List' }}</b></h5>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -94,18 +98,18 @@
     </div>
 
 
-    <h4 class="card-title mt-4 mb-4">{{ __('Today Uploaded Candidates List ') }}</h4>
+    {{-- Today Uploaded Candidate list --}}
+    <h5 class="m-4"><b>{{ 'Today Uploaded Candidate list' }}</b></h5>
     <div class="row">
         <div class="col-lg-12">
-            <div class="card">
-              <h5 class="m-4"><b>{{'Candidates List'}}</b></h5>
-                {{-- <form action="{{ route('dashboard') }}" method="get">
+            <div class="card p-4">
+                <form action="{{ route('dashboard') }}" method="get">
                     <div class="row m-3">
                         @role('admin')
                             <div class="col-lg-2">
                                 <label for="">{{ 'Managers Filter' }}</label>
                                 <select name="manager" id="manager" class="form-control">
-                                    <option value="" disabled selected>--Select Manager--</option>
+                                    <option value="">All</option>
                                     @foreach ($managers as $mana)
                                         <option value="{{ $mana->id }}"
                                             {{ isset($_REQUEST['manager']) && $_REQUEST['manager'] == $mana->id ? 'selected' : '' }}>
@@ -118,11 +122,11 @@
 
                         <div class="col-lg-3">
                             <label for="candidate_role">{{ 'Role Filter' }}</label>
-                            <select name="candidate_role" id="candidate_role" class="form-control">
+                            <select name="role" id="candidate_role" class="form-control">
                                 <option value="">All</option>
                                 @foreach ($candidateRole as $role)
                                     <option value="{{ $role->id }} "
-                                        {{ isset($_REQUEST['candidate_role']) && $_REQUEST['candidate_role'] == $role->id ? 'selected' : '' }}>
+                                        {{ isset($_REQUEST['role']) && $_REQUEST['role'] == $role->id ? 'selected' : '' }}>
 
                                         {{ $role->candidate_role }}
                                     </option>
@@ -131,20 +135,20 @@
                         </div>
 
                         <div class="col-lg-2">
-                            <x-form.select name="tage" label="Tage Filter" chooseFileComment="All" :options="[
+                            <x-form.select name="tag" label="Tag Filter" chooseFileComment="All" :options="[
                                 'interview scheduled' => 'Interview Scheduled',
                                 'interviewed' => 'Interviewed',
                                 'selected' => 'Selected',
                                 'rejected' => 'Rejected',
                             ]"
-                                :selected="isset($_REQUEST['tage']) ? $_REQUEST['tage'] : ''" />
+                                :selected="isset($_REQUEST['tag']) ? $_REQUEST['tag'] : ''" />
                         </div>
 
                         <div class="col-3">
                             <label for="search">{{ 'Search' }}</label>
-                            <input type="text" name="search" id="search" class="form-control"
+                            <input type="text" name="iteam" id="iteam" class="form-control"
                                 placeholder="Search....."
-                                value="{{ isset($_REQUEST['search']) ? $_REQUEST['search'] : '' }}" />
+                                value="{{ isset($_REQUEST['iteam']) ? $_REQUEST['iteam'] : '' }}" />
                         </div>
 
                         <div class="col-2">
@@ -152,14 +156,14 @@
                             <a href="{{ route('dashboard') }}" class="btn btn-secondary mt-lg-4">{{ 'Reset' }}</a>
                         </div>
                     </div>
-                </form> --}}
+                </form>
 
                 <div class="table-responsive">
                     <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr>
-                                <th>{{'#'}}</th>
+                                <th>{{ '#' }}</th>
                                 <th>{{ 'Candidate Name' }}</th>
                                 <th>{{ 'Phone' }}</th>
                                 <th>{{ 'Role' }}</th>
@@ -175,14 +179,15 @@
                         </thead>
 
                         <tbody id="candidatesData">
-                            @foreach ($currentUploadedCandidates as $candidate)
+                            @foreach ($uploadedCandidates as $candidate)
                                 <tr>
-                                    <td>{{ ($currentUploadedCandidates->currentPage() - 1) * $currentUploadedCandidates->perPage() + $loop->index + 1 }}
+                                    <td>{{ ($uploadedCandidates->currentPage() - 1) * $uploadedCandidates->perPage() + $loop->index + 1 }}
                                     </td>
                                     <td>{{ $candidate->candidate_name }}</td>
                                     <td>{{ $candidate->contact }}</td>
                                     <td>{{ $candidate->candidateRole->candidate_role ?? 'Null' }}</td>
-                                    <td>{{ $candidate->interview_status_tage ?? 'No Status' }}</td>
+                                    <td>{{ isset($candidate->interview_status_tag) ? Str::ucfirst($candidate->interview_status_tag) : 'No Status' }}</td>
+
                                     <td>{{ $candidate->experience }}</td>
                                     <td>
                                         {{ \Carbon\Carbon::parse($candidate->date)->format('d-M-Y') }}
@@ -199,6 +204,20 @@
                                                 class="btn btn-primary waves-effect waves-light view">
                                                 <i class="ri-eye-line"></i>
                                             </a>
+
+
+                                            @if (!empty($candidate->upload_resume))
+                                            @php
+                                                $resumePath = $candidate->upload_resume;
+                                            @endphp
+                                            @if (Storage::disk('local')->exists($resumePath))
+                                                <a href="{{ route('download.resume', ['resume' => $candidate->id]) }}"
+                                                    class="btn btn-success">
+                                                    <i class="ri-download-cloud-fill"></i>
+                                                </a>
+                                            @endif
+                                                @endif
+
                                         </div>
                                     </td>
 
@@ -207,9 +226,10 @@
                         </tbody>
                     </table>
                 </div>
-                {{ $currentUploadedCandidates->appends(request()->query())->links() }}
+                {{ $uploadedCandidates->appends(request()->query())->links() }}
 
             </div>
         </div> <!-- end col -->
     </div>
+
 @endsection

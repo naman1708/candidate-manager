@@ -88,6 +88,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('upload-candidate-resumes/', [CandidateController::class, 'uploadResume'])->name('candidate.uploadResume');
 
+    Route::post('/candidate-edit-instructions/{candidate_id?}', [CandidateController::class, 'candidateAddEditInstructions'])->name('candidateAddEditInstructions');
+
+
+    Route::get('getSuperadminInstruction/{candidate_id}', [CandidateController::class, 'getSuperadminInstruction'])->name('getSuperadminInstruction');
+
 
 
     // Candidate  Role routes
@@ -104,10 +109,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
+
+
     // Schedule Interview Controller Route
 
-    Route::post('candidate-schedule-interview',[ScheduleInterviewController::class,'scheduleInterview'])->name('candidate.scheduleInterview');
+    Route::post('candidate-schedule-interview', [ScheduleInterviewController::class, 'scheduleInterview'])->name('candidate.scheduleInterview');
 
+    // DashboardController Controller Route
+    Route::get('todays-uploaded-candidates', [DashboardController::class, 'currentDateUploadedCandidates'])->name('currentDateUploadedCandidates');
 });
 
 

@@ -121,7 +121,6 @@
                                         <th>{{ 'Createby' }}</th>
                                     @endrole
                                     <th>{{ 'Actions' }}</th>
-                                    <th>{{ 'Download Resume' }}</th>
                                 </tr>
                             </thead>
 
@@ -148,34 +147,34 @@
                                         @endrole
 
                                         <td>
-                                            <div class="action-btns text-center" role="group">
-                                                <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
-                                                    class="btn btn-primary waves-effect waves-light view">
-                                                    <i class="ri-eye-line"></i>
+                                            <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
+                                                class="btn btn-primary"> <i class="fa fa-eye"></i></a>
+                                            @can('candidate-delete')
+                                                <a href="{{ route('candidate.delete', [$info->id]) }}"
+                                                    class="btn btn-danger del"
+                                                    onclick="return confirm('Are you sure delete this record!')"><i
+                                                        class="fa fa-trash"></i>
                                                 </a>
+                                            @endcan
 
-                                                @can('candidate-delete')
-                                                    <a href="{{ route('candidate.delete', [$info->id]) }}"
-                                                        class="btn btn-danger waves-effect waves-light del"
-                                                        onclick="return confirm('Are you sure delete this record!')">
-                                                        <i class="ri-delete-bin-line"></i>
-                                                    </a>
-                                                @endcan
-                                            </div>
-                                        </td>
-                                        @if (!empty($info->upload_resume))
-                                            @php
-                                                $resumePath = $info->upload_resume;
-                                            @endphp
-                                            @if (Storage::disk('local')->exists($resumePath))
-                                                <td class="text-center">
+                                            @role('admin')
+                                                <a href="javascript:void(0)"
+                                                    class="btn btn-warning m-4"onclick="addEditInstruction(<?= $info->id ?>)">{{ 'Instruction' }}</a>
+                                            @endrole
+
+                                            @if (!empty($info->upload_resume))
+                                                @php
+                                                    $resumePath = $info->upload_resume;
+                                                @endphp
+                                                @if (Storage::disk('local')->exists($resumePath))
                                                     <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
-                                                        class="btn btn-primary btn-sm">
+                                                        class="btn btn-success">
                                                         <i class="ri-download-cloud-fill"></i>
                                                     </a>
-                                                </td>
+                                                @endif
                                             @endif
-                                        @endif
+                                        </td>
+
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -188,9 +187,58 @@
             </div>
         </div> <!-- end col -->
     </div> <!-- end row -->
+
+
+    {{-- Cooment Model Form --}}
+
+    <!-- Modal for adding/editing instructions -->
+    <div class="modal fade" id="superadminInstructionModel" tabindex="-1" aria-labelledby="superadminInstructionModelLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="{{ route('candidateAddEditInstructions', ['candidate_id' => $info->id]) }}" method="post">
+                    @csrf
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addCommentModelLabel">{{ 'Superadmin Instruction' }}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label for="">Instructions <span class="text-danger">*</span></label>
+                                <textarea name="superadmin_instruction" id="superadmin_instruction" cols="20" rows="10"
+                                    class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Instruction</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
 @endsection
 
 @push('script')
+    <script>
+        function addEditInstruction(candidate_id) {
+            // Show the modal
+            $('#superadminInstructionModel').modal('show');
+
+            let url = '{{ url('getSuperadminInstruction') }}/' + candidate_id;
+            $.get(url, function(data) {
+
+                $('#superadmin_instruction').val(data.superadmin_instruction);
+
+                $('#superadminInstructionModel form').attr('action', '{{ url('candidate-edit-instructions') }}/' +
+                    candidate_id);
+            });
+        }
+    </script>
+
     {{-- File export script --}}
     <script>
         $(document).ready(function() {

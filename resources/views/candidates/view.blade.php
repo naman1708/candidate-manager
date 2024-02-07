@@ -12,15 +12,18 @@
 
 @section('content')
     <x-status-message />
+
     {{-- Candidates details --}}
- <div class="m-4">
-    <a href="{{ route('candidates') }}" class="btn btn-primary">{{ 'Back' }}</a>
-    @can('candidate-edit')
-    <a href="{{ route('candidate.edit', [$candidate->id]) }}" class="btn btn-info waves-effect waves-light edit float-end">{{'Candidate Edit Profile'}}
-        <i class="ri-pencil-line"></i>
-    </a>
-@endcan
- </div>
+    <div class="m-4">
+        <a href="{{ url()->previous() }}" class="btn btn-warning">{{ 'Back' }}</a>
+        <a href="{{ route('candidates') }}" class="btn btn-primary">{{ 'Candidates' }}</a>
+        @can('candidate-edit')
+            <a href="{{ route('candidate.edit', [$candidate->id]) }}"
+                class="btn btn-info waves-effect waves-light edit float-end">{{ 'Candidate Edit Profile' }}
+                <i class="ri-pencil-line"></i>
+            </a>
+        @endcan
+    </div>
 
     <div class="row">
         <div class="col-lg-6">

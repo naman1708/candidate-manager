@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
@@ -159,7 +160,7 @@ class CandidateController extends Controller
     public function edit($candidates)
     {
         $candidates = Candidate::find($candidates);
-        $candidateRole = CandidateRoles::where('status', 'active')->pluck('candidate_role', 'id')->toArray();;
+        $candidateRole = CandidateRoles::where('status', 'active')->pluck('candidate_role', 'id')->toArray();
         return view('candidates.edit')->with(compact('candidates', 'candidateRole'));
     }
 
@@ -338,5 +339,23 @@ class CandidateController extends Controller
         $file->storeAs('resumes', $fileName, 'local');
 
         return redirect()->back()->with('status', "Resume uploaded successfully");
+    }
+
+    // Candidate AddEdit Instructions
+    public function candidateAddEditInstructions(Request $request, $candidateId = null)
+    {
+        $candidate = Candidate::findOrFail($candidateId);
+        $candidate->update([
+            'superadmin_instruction' => $request->superadmin_instruction,
+        ]);
+
+        return Redirect::back()->with('status', 'Instruction details saved successfully');
+    }
+
+
+    public function getSuperadminInstruction($candidate_id)
+    {
+        $candidate = Candidate::findOrFail($candidate_id);
+        return response()->json(['superadmin_instruction' => $candidate->superadmin_instruction]);
     }
 }
