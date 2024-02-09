@@ -108,17 +108,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/delete-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'destroy'])->name('candidatesRole.delete');
 
 
-
-
-
     // Schedule Interview Controller Route
 
     Route::post('candidate-schedule-interview', [ScheduleInterviewController::class, 'scheduleInterview'])->name('candidate.scheduleInterview');
 
     // DashboardController Controller Route
     Route::get('todays-uploaded-candidates', [DashboardController::class, 'currentDateUploadedCandidates'])->name('currentDateUploadedCandidates');
-});
 
+
+    // Information Controllers Route
+    Route::get('informations', [InformationController::class, 'informations'])->name('informations');
+    Route::get('informations-view/{information?}', [InformationController::class, 'show'])->name('information.show');
+
+    Route::get('informations-add', [InformationController::class, 'create'])->name('information.create');
+    Route::post('informations-store', [InformationController::class, 'store'])->name('information.store');
+
+    Route::get('informations-edit/{information?}', [InformationController::class, 'edit'])->name('information.edit');
+    Route::post('informations-update{information?}', [InformationController::class, 'update'])->name('information.update');
+
+    Route::get('informations-delete/{information?}', [InformationController::class, 'delete'])->name('information.delete');
+
+    Route::get('informations-user/{user_id?}', [UserController::class, 'usersInformations'])->name('user.info');
+
+});
 
 
 

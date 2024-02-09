@@ -76,6 +76,8 @@
                                                         <i class="ri-delete-bin-line"></i>
                                                     </button>
                                                 </form>
+
+                                                <a href="{{route('user.info',['user_id'=>$user->id])}}" class="btn btn-warning">{{'Informations'}}</a>
                                             </div>
                                         </td>
                                     </tr>

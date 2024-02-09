@@ -186,7 +186,8 @@
                                     <td>{{ $candidate->candidate_name }}</td>
                                     <td>{{ $candidate->contact }}</td>
                                     <td>{{ $candidate->candidateRole->candidate_role ?? 'Null' }}</td>
-                                    <td>{{ isset($candidate->interview_status_tag) ? Str::ucfirst($candidate->interview_status_tag) : 'No Status' }}</td>
+                                    <td>{{ isset($candidate->interview_status_tag) ? Str::ucfirst($candidate->interview_status_tag) : 'No Status' }}
+                                    </td>
 
                                     <td>{{ $candidate->experience }}</td>
                                     <td>
@@ -205,18 +206,21 @@
                                                 <i class="ri-eye-line"></i>
                                             </a>
 
+                                                <a href="javascript:void(0)"
+                                                class="btn btn-warning m-4" onclick="addEditInstruction(<?= $candidate->id ?>)">{{ 'Instruction' }}</a>
+
 
                                             @if (!empty($candidate->upload_resume))
-                                            @php
-                                                $resumePath = $candidate->upload_resume;
-                                            @endphp
-                                            @if (Storage::disk('local')->exists($resumePath))
-                                                <a href="{{ route('download.resume', ['resume' => $candidate->id]) }}"
-                                                    class="btn btn-success">
-                                                    <i class="ri-download-cloud-fill"></i>
-                                                </a>
-                                            @endif
+                                                @php
+                                                    $resumePath = $candidate->upload_resume;
+                                                @endphp
+                                                @if (Storage::disk('local')->exists($resumePath))
+                                                    <a href="{{ route('download.resume', ['resume' => $candidate->id]) }}"
+                                                        class="btn btn-success">
+                                                        <i class="ri-download-cloud-fill"></i>
+                                                    </a>
                                                 @endif
+                                            @endif
 
                                         </div>
                                     </td>
@@ -232,4 +236,59 @@
         </div> <!-- end col -->
     </div>
 
+
+
+    <!-- Modal for adding/editing instructions -->
+    <div class="modal fade" id="superadminInstructionModel" tabindex="-1"
+        aria-labelledby="superadminInstructionModelLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="" method="post">
+                    @csrf
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addCommentModelLabel">{{ 'Superadmin Instruction' }}</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label for="">Instructions <span class="text-danger">*</span></label>
+                                <textarea name="superadmin_instruction" id="superadmin_instruction" cols="20" rows="10"
+                                    class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    @role('admin')
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save Instruction</button>
+                        </div>
+                    @endrole
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
+
+@push('script')
+
+
+    <script>
+        function addEditInstruction(candidate_id) {
+            // Show the modal
+            $('#superadminInstructionModel').modal('show');
+
+            let url = '{{ url('getSuperadminInstruction') }}/' + candidate_id;
+            $.get(url, function(data) {
+
+                $('#superadmin_instruction').val(data.superadmin_instruction);
+
+                $('#superadminInstructionModel form').attr('action', '{{ url('candidate-edit-instructions') }}/' +
+                    candidate_id);
+            });
+        }
+    </script>
+
+
+
+@endpush

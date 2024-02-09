@@ -56,6 +56,14 @@
                     </ul>
                 </li>
 
+                <li>
+                    <a href="{{route('informations')}}" class="waves-effect">
+                        {{-- <i class="ri-dashboard-line"></i> --}}
+                        <i class="ri-vip-crown-2-line"></i>
+                        <span>{{'Details'}}</span>
+                    </a>
+                </li>
+
 
                 @role('admin')
                 <li>

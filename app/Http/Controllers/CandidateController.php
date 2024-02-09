@@ -358,4 +358,7 @@ class CandidateController extends Controller
         $candidate = Candidate::findOrFail($candidate_id);
         return response()->json(['superadmin_instruction' => $candidate->superadmin_instruction]);
     }
+
+
+    
 }

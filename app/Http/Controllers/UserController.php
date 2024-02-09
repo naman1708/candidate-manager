@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Information;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Exception;
@@ -129,5 +130,27 @@ class UserController extends Controller
         }
         DB::commit();
         return redirect()->back()->with('status', 'User deleted successfully');
+    }
+
+
+
+    public function usersInformations(Request $request, $user_id = null)
+    {
+        $search = $request->search;
+        $user = User::findOrFail($user_id);
+        $query = Information::where('user_id',$user_id);
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('portal_name', 'LIKE', "%$search%")
+                    ->orWhere('username', 'LIKE', "%$search%")
+                    ->orWhere('password', 'LIKE', "%$search%")
+                    ->orWhere('phone_number', 'LIKE', "%$search%");
+            });
+        }
+
+        $informationData = $query->orderBy('id', 'desc')->paginate(10);
+        return view('settings.user.user-information', compact('informationData', 'user'));
     }
 }

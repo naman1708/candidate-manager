@@ -147,32 +147,43 @@
                                         @endrole
 
                                         <td>
-                                            <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
-                                                class="btn btn-primary"> <i class="fa fa-eye"></i></a>
-                                            @can('candidate-delete')
-                                                <a href="{{ route('candidate.delete', [$info->id]) }}"
-                                                    class="btn btn-danger del"
-                                                    onclick="return confirm('Are you sure delete this record!')"><i
-                                                        class="fa fa-trash"></i>
-                                                </a>
-                                            @endcan
+                                            <div class="actiobBtn d-inline-flex p-2">
+                                                <a href="{{ route('candidate.view', ['candidate' => $info->id]) }}"
+                                                    class="btn btn-primary" style="height: 40px;margin-right: 10px;"> <i class="fa fa-eye"></i></a>
 
-                                            @role('admin')
-                                                <a href="javascript:void(0)"
-                                                    class="btn btn-warning m-4"onclick="addEditInstruction(<?= $info->id ?>)">{{ 'Instruction' }}</a>
-                                            @endrole
-
-                                            @if (!empty($info->upload_resume))
-                                                @php
-                                                    $resumePath = $info->upload_resume;
-                                                @endphp
-                                                @if (Storage::disk('local')->exists($resumePath))
-                                                    <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
-                                                        class="btn btn-success">
-                                                        <i class="ri-download-cloud-fill"></i>
+                                                @can('candidate-delete')
+                                                    <a href="{{ route('candidate.delete', [$info->id]) }}"
+                                                        class="btn btn-danger"
+                                                        onclick="return confirm('Are you sure delete this record!')" style="
+                                                        height: 40px;
+                                                        width: 45px;
+                                                        margin-right: 10px;
+                                                    "><i
+                                                            class="fa fa-trash"></i>
                                                     </a>
+                                                @endcan
+
+                                                <a href="javascript:void(0)" class="btn btn-warning"
+                                                    onclick="addEditInstruction(<?= $info->id ?>)" style="
+                                                    height: 40px;
+                                                    margin-right: 10px;
+                                                ">{{ 'Instruction' }}</a>
+
+
+                                                @if (!empty($info->upload_resume))
+                                                    @php
+                                                        $resumePath = $info->upload_resume;
+                                                    @endphp
+                                                    @if (Storage::disk('local')->exists($resumePath))
+                                                        <a href="{{ route('download.resume', ['resume' => $info->id]) }}"
+                                                            class="btn btn-success" style="
+                                                            height: 40px;
+                                                            width: 45px;
+                                                        "> <i class="ri-download-cloud-fill"></i>
+                                                        </a>
+                                                    @endif
                                                 @endif
-                                            @endif
+                                            </div>
                                         </td>
 
                                     </tr>
@@ -188,15 +199,12 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-
-    {{-- Cooment Model Form --}}
-
     <!-- Modal for adding/editing instructions -->
     <div class="modal fade" id="superadminInstructionModel" tabindex="-1" aria-labelledby="superadminInstructionModelLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form action="{{ route('candidateAddEditInstructions', ['candidate_id' => $info->id]) }}" method="post">
+                <form action="" method="post">
                     @csrf
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="addCommentModelLabel">{{ 'Superadmin Instruction' }}</h1>
@@ -211,9 +219,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save Instruction</button>
-                    </div>
+                    @role('admin')
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save Instruction</button>
+                        </div>
+                    @endrole
                 </form>
             </div>
         </div>
