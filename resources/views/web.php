@@ -42,7 +42,6 @@ Route::get('/', function () {
 Route::group(['middleware' => ['auth', 'role:admin']], function () {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
-    Route::get('/user-status-update/{id}', [UserController::class, 'userStatusUpdate'])->name('user.statusUpdate');
 });
 
 
@@ -109,12 +108,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/delete-candidate-role/{candidatesRole?}', [CandidateRolesController::class, 'destroy'])->name('candidatesRole.delete');
 
 
+
+
+
     // Schedule Interview Controller Route
 
     Route::post('candidate-schedule-interview', [ScheduleInterviewController::class, 'scheduleInterview'])->name('candidate.scheduleInterview');
 
     // DashboardController Controller Route
     Route::get('todays-uploaded-candidates', [DashboardController::class, 'currentDateUploadedCandidates'])->name('currentDateUploadedCandidates');
+});
+
+
 
 
     // Information Controllers Route
@@ -130,8 +135,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('informations-delete/{information?}', [InformationController::class, 'delete'])->name('information.delete');
 
     Route::get('informations-user/{user_id?}', [UserController::class, 'usersInformations'])->name('user.info');
-
-});
 
 
 

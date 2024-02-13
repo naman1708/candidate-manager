@@ -12,6 +12,7 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 
 class UserController extends Controller
 {
@@ -49,6 +50,9 @@ class UserController extends Controller
         try {
 
             $input = $request->all();
+
+            $input['status'] = $request->customer_status;
+
             $input['password'] = Hash::make($input['password']);
 
             $user = User::create($input);
@@ -98,6 +102,9 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $input = $request->all();
+
+            $input['status'] = $request->customer_status;
+
             if (!empty($input['password'])) {
                 $input['password'] = Hash::make($input['password']);
             } else {
@@ -153,4 +160,14 @@ class UserController extends Controller
         $informationData = $query->orderBy('id', 'desc')->paginate(10);
         return view('settings.user.user-information', compact('informationData', 'user'));
     }
+
+
+     // User status change
+     public function userStatusUpdate($id)
+     {
+         $userBlock = User::find($id);
+         $userBlock->status = $userBlock->status == 'active' ? 'block' : 'active';
+         $userBlock->update();
+         return Redirect::back()->with('status',  $userBlock->name . ' User status has been updated.');
+     }
 }

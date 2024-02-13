@@ -1,11 +1,11 @@
 @extends('layouts.main')
 
 @push('page-title')
-<title>{{ __('Edit User')}}</title>
+<title>{{ __('Edit Managers')}}</title>
 @endpush
 
 @push('heading')
-{{ __('Edit User') }}
+{{ __('Edit Managers') }}
 @endpush
 
 @section('content')
@@ -21,7 +21,7 @@
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="id" value="{{$user->id}}">
-                    <h4 class="card-title mb-3">{{__('User Details')}}</h4>
+                    <h4 class="card-title mb-3">{{__('Managers Details')}}</h4>
 
                     <div class="row">
                         <div class="col-lg-6">
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                                 <strong>Role:</strong>
                                 <select name="roles" class="form-select">
                                     @foreach ($roles as $roleValue => $roleLabel)
@@ -52,6 +52,14 @@
                                         </option>
                                     @endforeach
                                 </select>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <x-form.select name="customer_status" label="Status"
+                                chooseFileComment="--Select Status--" :options="[
+                                    'active' => 'Active',
+                                    'block' => 'Block',
+                                ]" :selected="$user->status" />
                         </div>
                     </div>
 

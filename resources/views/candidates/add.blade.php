@@ -45,7 +45,6 @@
                                     name="candidate_role_id" :options="$candidateRole" />
                             </div>
 
-
                             <div class="col-lg-6">
                                 <x-form.input name="date" label="Date" type="date" value="<?php echo date('Y-m-d'); ?>" />
                             </div>

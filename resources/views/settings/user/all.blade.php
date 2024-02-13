@@ -1,11 +1,11 @@
 @extends('layouts.main')
 
 @push('page-title')
-    <title>All Candidates</title>
+    <title>All Managers</title>
 @endpush
 
 @push('heading')
-    {{ 'Candidates Roles' }}
+    {{ 'All Managers' }}
 @endpush
 
 @section('content')
@@ -19,7 +19,7 @@
             <div class="card">
                 <div class="row container mt-4 mb-4" style="display:flex; justify-content: space-between;">
                     <div class="col-6">
-                        <a href="{{ route('users.create') }}" class="btn btn-success btn-sm mt-4">Create New user</a>
+                        <a href="{{ route('users.create') }}" class="btn btn-success btn-sm mt-4">Create New Manager</a>
                     </div>
                     <div class="col-4 d-flex">
                         <x-search.table-search action="#" method="get" name="search"
@@ -38,6 +38,7 @@
                                     <th>{{ 'Name' }}</th>
                                     <th>{{ 'Email' }}</th>
                                     <th>{{ 'Role' }}</th>
+                                    <th>{{ 'Status' }}</th>
                                     <th>{{ 'Actions' }}</th>
 
                                 </tr>
@@ -53,6 +54,14 @@
                                                 @foreach ($user->getRoleNames() as $v)
                                                     <label class="badge bg-success">{{ $v }}</label>
                                                 @endforeach
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            @if ($user->status == 'active')
+                                            <a href="{{route('user.statusUpdate',$user->id)}}" class="btn btn-primary btn-sm" onclick="return confirm('Are you sure Block This User')">Active</a>
+                                            @else
+                                            <a href="{{route('user.statusUpdate',$user->id)}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure Active This User')">Block</a>
                                             @endif
                                         </td>
 

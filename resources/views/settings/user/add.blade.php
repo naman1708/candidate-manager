@@ -1,11 +1,11 @@
 @extends('layouts.main')
 
 @push('page-title')
-<title>{{ __('Add User')}}</title>
+<title>{{ __('Add Managers')}}</title>
 @endpush
 
 @push('heading')
-{{ __('Add User') }}
+{{ __('Add Managers') }}
 @endpush
 
 @section('content')
@@ -19,7 +19,7 @@
 
                 <form method="post" action="{{route('users.store')}}" enctype="multipart/form-data">
                     @csrf
-                    <h4 class="card-title mb-3">{{__('User Details')}}</h4>
+                    <h4 class="card-title mb-3">{{__('Managers Details')}}</h4>
 
                     <div class="row">
                         <div class="col-lg-6">
@@ -41,10 +41,20 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-12">
+
+                        <div class="col-lg-6">
                             <x-form.select label="Role" chooseFileComment="--Select Role--"
                                 name="roles" :options="$roles" />
                         </div>
+
+                        <div class="col-lg-6">
+                            <x-form.select name="customer_status" label="Status"
+                                chooseFileComment="--Select Status--" :options="[
+                                    'active' => 'Active',
+                                    'block' => 'Block',
+                                ]" />
+                        </div>
+
                     </div>
 
                     <div>
