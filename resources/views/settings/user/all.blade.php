@@ -31,10 +31,11 @@
 
                 <div class="card-body text-center">
                     <div class="table-responsive">
-                        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap mx-auto w-75"
+                        <table id="datatable" class="table table-striped table-bordered dt-responsive nowrap mx-auto"
                             style="border-collapse: collapse; border-spacing: 0;">
                             <thead>
                                 <tr>
+                                    <th>{{ '#' }}</th>
                                     <th>{{ 'Name' }}</th>
                                     <th>{{ 'Email' }}</th>
                                     <th>{{ 'Role' }}</th>
@@ -47,6 +48,8 @@
                             <tbody id="candidatesData">
                                 @foreach ($data as $key => $user)
                                     <tr>
+                                        <td>{{ ($data->currentPage() - 1) * $data->perPage() + $loop->index + 1 }}
+                                        </td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
                                         <td>

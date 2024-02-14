@@ -12,6 +12,7 @@
 
 @section('content')
 
+<a href="{{route('users.index')}}" class="btn btn-warning btn-sm m-2"> <i class="fa fa-backward"></i> {{'Back'}}</a>
     {{-- Managers details --}}
     <div class="row">
         <div class="col-lg-6">
