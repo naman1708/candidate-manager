@@ -113,7 +113,11 @@ class UserController extends Controller
 
             $user = User::find($id);
             $user->update($input);
-            DB::table('model_has_roles')->where('model_id', $id)->delete();
+
+            $user->roles()->detach();
+
+            // DB::table('model_has_roles')->where('model_id', $id)->delete();
+
             $user->assignRole($request->input('roles'));
         } catch (Exception $e) {
             DB::rollback();
